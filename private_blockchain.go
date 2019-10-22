@@ -51,15 +51,9 @@ type Block struct {
 	Value  string // root hash of merkle tree
 }
 
-// func NewBlock(height int32, p_hash string, value string) *Block {
-// 	header := NewHeader(height, p_hash)
-// 	return &Block{Header: header, Value: value}
-// }
-
 func (b *Block) Initialize(height int32, parent_hash string, value string) {
 	b.Value = value
 	b.Header = NewHeader(height, parent_hash)
-	fmt.Println("block height", b.Header.height)
 	hash_str := string(b.Header.height) + string(b.Header.timestamp) + b.Header.parent_hash + string(b.Header.size) + b.Value
 	digest := makeSha256Digest(hash_str)
 	b.Header.hash = digest
@@ -85,7 +79,6 @@ func (b *Block) EncodeToJson() string {
 func DecodeFromJson(m string) *Block {
 	var shape JsonShape
 	json.Unmarshal([]byte(m), &shape)
-	fmt.Println("shape time stamp", shape.Timestamp)
 	h := &Header{
 		height:      shape.Height,
 		timestamp:   shape.Timestamp,
@@ -182,7 +175,7 @@ func makeTenBlocks() []Block {
 
 // tests
 func main() {
-	fmt.Println("hello world")
+	fmt.Println("Beggining of main")
 	test3()
 }
 
@@ -212,7 +205,6 @@ func test1() {
 	// printBlock(b_zero)
 	encoded := b_zero.EncodeToJson()
 	//fmt.Println(encoded)
-
 	b_zero_2 := DecodeFromJson(encoded)
 	printBlock(b_zero_2)
 	fmt.Println(b_zero_2.EncodeToJson())
