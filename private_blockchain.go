@@ -102,6 +102,13 @@ type BlockChain struct {
 	Length int32
 }
 
+func NewBlockChain() *BlockChain {
+	var bc BlockChain
+	bc.Chain = make(map[int32][]Block)
+	bc.Length = int32(0)
+	return &bc
+}
+
 func (bc *BlockChain) Get(height int32) []Block {
 	if val, ok := bc.Chain[height]; ok {
 		return val
@@ -117,8 +124,13 @@ func (bc *BlockChain) Insert(b Block) {
 				return
 			}
 		}
+		bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	} else {
+		bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
 	}
-	bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	if b.Header.height > bc.Length {
+		bc.Length = b.Header.height
+	}
 }
 
 func (bc *BlockChain) EncodeToJson() []string {
@@ -126,10 +138,17 @@ func (bc *BlockChain) EncodeToJson() []string {
 	for _, block_slice := range bc.Chain {
 		for _, block := range block_slice {
 			encoded_block := block.EncodeToJson()
-			append(json_blocks, encoded_block)
+			json_blocks = append(json_blocks, encoded_block)
 		}
 	}
-	return json_block
+	return json_blocks
+}
+
+func (bc *BlockChain) DecodeFromJson(json_blocks []string) {
+	for _, json_b := range json_blocks {
+		block := DecodeFromJson(json_b)
+		bc.Insert(*block)
+	}
 }
 
 func make_genesis_block() Block {
@@ -140,34 +159,54 @@ func make_genesis_block() Block {
 	return b
 }
 
-func main() {
-	fmt.Println("hello world")
-	test()
-}
-
+// testing utils
 func printStringSlice(slice []string) {
-	fmt.Println
+	fmt.Println("about to print each json block in list")
 	for _, json_block := range slice {
 		fmt.Println(json_block)
 	}
 }
 
-func makeTenBlocks() []*Block{
+func makeTenBlocks() []Block {
 	b_zero := make_genesis_block()
-  blocks = []*Blocks
-  append(blocks, b_zero)
-  for i:=1; i<10; i++{
-    var b *Block
-    b.Initialize((i%4) + 1, blocks[i-1].Header.hash, "test block value")
-    append(blocks, b.Initialize)
-  }
+	var blocks []Block
+	blocks = append(blocks, b_zero)
+	for i := 1; i < 10; i++ {
+		var b Block
+		height := int32((i % 4) + 1)
+		b.Initialize(height, blocks[i-1].Header.hash, "test block value")
+		blocks = append(blocks, b)
+	}
+	return blocks
 }
 
-
-func test2(){
-  var bc BlockChain
-  blocks = makeTenBlocks()
+// tests
+func main() {
+	fmt.Println("hello world")
+	test3()
 }
+
+func test2() {
+	bc := NewBlockChain()
+	bc.Insert(make_genesis_block())
+	json_bc := bc.EncodeToJson()
+	printStringSlice(json_bc)
+}
+
+func test3() {
+	bc := NewBlockChain()
+	blocks := makeTenBlocks()
+	for _, b := range blocks {
+		bc.Insert(b)
+	}
+	json_bc := bc.EncodeToJson()
+	bc2 := NewBlockChain()
+	bc2.DecodeFromJson(json_bc)
+	json_bc2 := bc2.EncodeToJson()
+	printStringSlice(json_bc2)
+	fmt.Println("Length of the block chain is : ", bc2.Length)
+}
+
 func test1() {
 	b_zero := make_genesis_block()
 	// printBlock(b_zero)
