@@ -92,7 +92,7 @@ func DecodeFromJson(m string) *Block {
 
 type BlockChain struct {
 	Chain  map[int32][]Block
-	Length int32
+	Length int32 // length starts at 1
 }
 
 func NewBlockChain() *BlockChain {
@@ -121,12 +121,13 @@ func (bc *BlockChain) Insert(b Block) {
 				return
 			}
 		}
-		bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
-	} else {
-		bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
 	}
-	if b.Header.height > bc.Length {
-		bc.Length = b.Header.height
+	bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	// } else {
+	// 	bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	// }
+	if b.Header.height+1 > bc.Length {
+		bc.Length = b.Header.height + 1
 	}
 }
 
@@ -180,15 +181,17 @@ func printStringSlice(slice []string) {
 }
 
 func makeTenBlocks() []Block {
-	// creates an array of 10 blocks of 5 different heights
+	// creates an array of 10 blocks of 6 different heights
 	// starts with a genesis block as the only block at height zero
+	heights := [9]int32{1, 1, 2, 2, 3, 3, 4, 4, 5}
 	b_zero := make_genesis_block()
 	var blocks []Block
 	blocks = append(blocks, b_zero)
 	for i := 1; i < 10; i++ {
 		var b Block
-		height := int32((i % 4) + 1)
-		b.Initialize(height, blocks[i-1].Header.hash, "test block value")
+		// height := int32((i % 4) + 1)
+		// naive parent hash, not actually accurate to chain
+		b.Initialize(heights[i-1], blocks[i-1].Header.hash, "test block value")
 		blocks = append(blocks, b)
 	}
 	return blocks
