@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+/*
+To create a block declare and instance and then use the block initialize method.
+To create a blockchain use the NewBlockChain() method create an instance that is
+initialized with an empty map.
+
+Blocks supports Initialize, DecodeFromJson and EncodeFromJson.
+
+BlockChain supports Get, Insert, EncodeToJson, and DecodeFromJson. BlockChain
+length starts at 1
+
+make_genesis_block() is useful for making an arbitrary genesis block for a
+Blockchain.
+*/
+
 // general utils
 func makeSha256Digest(m string) string {
 	//takes a message string and returns a string of messages sh256 digest
@@ -15,6 +29,12 @@ func makeSha256Digest(m string) string {
 	h.Write([]byte(m))
 	out_hash := hex.EncodeToString(h.Sum(nil))
 	return out_hash
+}
+
+//Structs
+type BlockChain struct {
+	Chain  map[int32][]Block
+	Length int32 // length starts at 1
 }
 
 type JsonShape struct {
@@ -35,6 +55,12 @@ type Header struct {
 	hash        string // hash_str := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
 }
 
+type Block struct {
+	Header *Header
+	Value  string // root hash of merkle tree
+}
+
+//Header tools
 func NewHeader(height int32, p_hash string) *Header {
 	// returns a header after given height and parent hash
 	// called by the block initialization method
@@ -42,11 +68,7 @@ func NewHeader(height int32, p_hash string) *Header {
 	return &Header{height: height, parent_hash: p_hash, timestamp: time, size: int32(32)}
 }
 
-type Block struct {
-	Header *Header
-	Value  string // root hash of merkle tree
-}
-
+//Block Methods
 func (b *Block) Initialize(height int32, parent_hash string, value string) {
 	// takes a block, its height, its parent_hash, and value and intializes it with
 	// header containing hash
@@ -90,11 +112,7 @@ func DecodeFromJson(m string) *Block {
 	return b
 }
 
-type BlockChain struct {
-	Chain  map[int32][]Block
-	Length int32 // length starts at 1
-}
-
+//BlockChain Methods and tools
 func NewBlockChain() *BlockChain {
 	// use this to create and initializea block chain instance
 	var bc BlockChain
@@ -162,7 +180,7 @@ func make_genesis_block() Block {
 	return b
 }
 
-// testing utils
+// Testing utils and functions
 func printBlock(b *Block) {
 	// prints blocks fields for debugging and testing purposes only
 	h := "height: " + string(b.Header.height) + ", timestamp: " + string(b.Header.timestamp) + ", parent hash: " + b.Header.parent_hash + ", size" + string(b.Header.size)
@@ -199,8 +217,8 @@ func makeTenBlocks() []Block {
 
 // tests
 func main() {
-	fmt.Println("Beggining of main")
-	test3()
+	//fmt.Println("Beggining of main")
+	//test3()
 }
 
 func test2() {
