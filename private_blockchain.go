@@ -10,21 +10,15 @@ import (
 
 // general utils
 func makeSha256Digest(m string) string {
+	//takes a message string and returns a string of messages sh256 digest
 	h := sha512.New()
 	h.Write([]byte(m))
 	out_hash := hex.EncodeToString(h.Sum(nil))
 	return out_hash
 }
 
-func printBlock(b *Block) {
-	h := "height: " + string(b.Header.height) + ", timestamp: " + string(b.Header.timestamp) + ", parent hash: " + b.Header.parent_hash + ", size" + string(b.Header.size)
-	value := "Block Value: " + b.Value
-	fmt.Println(value)
-	fmt.Println(h)
-	fmt.Println("___Block End___")
-}
-
 type JsonShape struct {
+	// for creating proper form when encoding a block to json
 	Height      int32
 	Timestamp   int64 // Unix timestamp
 	Parent_hash string
@@ -42,6 +36,8 @@ type Header struct {
 }
 
 func NewHeader(height int32, p_hash string) *Header {
+	// returns a header after given height and parent hash
+	// called by the block initialization method
 	time := int64(time.Now().Unix())
 	return &Header{height: height, parent_hash: p_hash, timestamp: time, size: int32(32)}
 }
@@ -52,6 +48,8 @@ type Block struct {
 }
 
 func (b *Block) Initialize(height int32, parent_hash string, value string) {
+	// takes a block, its height, its parent_hash, and value and intializes it with
+	// header containing hash
 	b.Value = value
 	b.Header = NewHeader(height, parent_hash)
 	hash_str := string(b.Header.height) + string(b.Header.timestamp) + b.Header.parent_hash + string(b.Header.size) + b.Value
@@ -60,6 +58,7 @@ func (b *Block) Initialize(height int32, parent_hash string, value string) {
 }
 
 func (b *Block) EncodeToJson() string {
+	// takes a block pointer and returns an json encoded string of the block
 	shape := JsonShape{
 		Height:      b.Header.height,
 		Timestamp:   b.Header.timestamp,
@@ -77,6 +76,7 @@ func (b *Block) EncodeToJson() string {
 }
 
 func DecodeFromJson(m string) *Block {
+	// takes in a string of a json encoded block and returns a block pointer
 	var shape JsonShape
 	json.Unmarshal([]byte(m), &shape)
 	h := &Header{
@@ -96,6 +96,7 @@ type BlockChain struct {
 }
 
 func NewBlockChain() *BlockChain {
+	// use this to create and initializea block chain instance
 	var bc BlockChain
 	bc.Chain = make(map[int32][]Block)
 	bc.Length = int32(0)
@@ -103,6 +104,8 @@ func NewBlockChain() *BlockChain {
 }
 
 func (bc *BlockChain) Get(height int32) []Block {
+	// takes an instance of a block chain and a height in int32
+	// returns a slice containing the blocks at that that height or nil
 	if val, ok := bc.Chain[height]; ok {
 		return val
 	}
@@ -110,6 +113,7 @@ func (bc *BlockChain) Get(height int32) []Block {
 }
 
 func (bc *BlockChain) Insert(b Block) {
+	// takes a blockchain instance and inserts a block instance by height
 	val, ok := bc.Chain[b.Header.height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -127,6 +131,8 @@ func (bc *BlockChain) Insert(b Block) {
 }
 
 func (bc *BlockChain) EncodeToJson() []string {
+	// takes a block chain instance and creates a slice of json block Data
+	// returns a the slice of json blocks
 	var json_blocks []string
 	for _, block_slice := range bc.Chain {
 		for _, block := range block_slice {
@@ -138,6 +144,8 @@ func (bc *BlockChain) EncodeToJson() []string {
 }
 
 func (bc *BlockChain) DecodeFromJson(json_blocks []string) {
+	//takes a blockchain instance and a list of json blocks and inserts each block
+	// into the blochchain instance
 	for _, json_b := range json_blocks {
 		block := DecodeFromJson(json_b)
 		bc.Insert(*block)
@@ -145,6 +153,7 @@ func (bc *BlockChain) DecodeFromJson(json_blocks []string) {
 }
 
 func make_genesis_block() Block {
+	//creates and returns a genesis block
 	p_hash := makeSha256Digest("hash this")
 	merkle_root_dummy := makeSha256Digest("root_dummy_hash")
 	var b Block
@@ -153,7 +162,17 @@ func make_genesis_block() Block {
 }
 
 // testing utils
+func printBlock(b *Block) {
+	// prints blocks fields for debugging and testing purposes only
+	h := "height: " + string(b.Header.height) + ", timestamp: " + string(b.Header.timestamp) + ", parent hash: " + b.Header.parent_hash + ", size" + string(b.Header.size)
+	value := "Block Value: " + b.Value
+	fmt.Println(value)
+	fmt.Println(h)
+	fmt.Println("___Block End___")
+}
+
 func printStringSlice(slice []string) {
+	// takes slice of json blocks and prints each one
 	fmt.Println("about to print each json block in list")
 	for _, json_block := range slice {
 		fmt.Println(json_block)
@@ -161,6 +180,8 @@ func printStringSlice(slice []string) {
 }
 
 func makeTenBlocks() []Block {
+	// creates an array of 10 blocks of 5 different heights
+	// starts with a genesis block as the only block at height zero
 	b_zero := make_genesis_block()
 	var blocks []Block
 	blocks = append(blocks, b_zero)
@@ -180,6 +201,7 @@ func main() {
 }
 
 func test2() {
+	// testing insertion of a block into the block chain
 	bc := NewBlockChain()
 	bc.Insert(make_genesis_block())
 	json_bc := bc.EncodeToJson()
@@ -187,6 +209,7 @@ func test2() {
 }
 
 func test3() {
+	// testing creating a blockchain, and block chain encoding and decoding
 	bc := NewBlockChain()
 	blocks := makeTenBlocks()
 	for _, b := range blocks {
@@ -201,6 +224,7 @@ func test3() {
 }
 
 func test1() {
+	// test making a genesis block and encoding of a single block
 	b_zero := make_genesis_block()
 	// printBlock(b_zero)
 	encoded := b_zero.EncodeToJson()
