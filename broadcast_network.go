@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"sort"
 	"strconv"
 )
 
-func (blockchain *Blockchain) ShowCanonical() string {
+// ShowCanonical displays canonical chain
+func (blockchain *BlockChain) ShowCanonical() string {
 	rs := ""
 	var idList []int
 	for id := range blockchain.Chain {
@@ -30,5 +32,29 @@ func (blockchain *Blockchain) ShowCanonical() string {
 		rs += "\n"
 	}
 	return rs
+}
 
+//Show displays the blockchain
+func (blockchain *BlockChain) Show() string {
+	rs := ""
+	var idList []int
+	for id := range blockchain.Chain {
+		idList = append(idList, int(id))
+	}
+	sort.Ints(idList)
+	for _, id := range idList {
+		var hashs []string
+		for _, block := range blockchain.Chain[int32(id)] {
+			hashs = append(hashs, block.Header.Hash+"<="+block.Header.ParentHash)
+		}
+		sort.Strings(hashs)
+		rs += fmt.Sprintf("%v: ", id)
+		for _, h := range hashs {
+			rs += fmt.Sprintf("%s, ", h)
+		}
+		rs += "\n"
+	}
+	sum := sha3.Sum256([]byte(rs))
+	rs = fmt.Sprintf("This is the BlockChain: %s\n", hex.EncodeToString(sum[:])) + rs
+	return rs
 }

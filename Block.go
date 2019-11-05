@@ -40,8 +40,9 @@ type BlockChain struct {
 //JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
+	Nonce      int32
 	Height     int32
-	Timestamp  int64 // Unix timestamp
+	Timestamp  int64 // Unix Timestamp
 	ParentHash string
 	Size       int32
 	Hash       string
@@ -50,51 +51,53 @@ type JSONShape struct {
 
 //Header Struct describing the fields of the header
 type Header struct {
-	height     int32
-	timestamp  int64 // Unix timestamp
+	Nonce      int32
+	Height     int32
+	Timestamp  int64 // Unix Timestamp
 	ParentHash string
-	size       int32
-	hash       string // hashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
+	Size       int32
+	Hash       string // HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
 }
 
 //Block struct with header pointer and value
 type Block struct {
 	Header *Header
-	Value  string // root hash of merkle tree
+	Value  string // root Hash of merkle tree
 }
 
 //Header tools
 
 // NewHeader is used to create and initialize a heder
-func NewHeader(height int32, pHash string) *Header {
-	// returns a header after given height and parent hash
+func NewHeader(Height int32, pHash string) *Header {
+	// returns a header after given Height and parent Hash
 	// called by the block initialization method
 	time := int64(time.Now().Unix())
-	return &Header{height: height, ParentHash: pHash, timestamp: time, size: int32(32)}
+	return &Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32)}
 }
 
 //Block Methods
 
 // Initialize an instance of a block
-func (b *Block) Initialize(height int32, ParentHash string, value string) {
-	// takes a block, its height, its ParentHash, and value and intializes it with
-	// header containing hash
+func (b *Block) Initialize(Height int32, ParentHash string, value string) {
+	// takes a block, its Height, its ParentHash, and value and intializes it with
+	// header containing Hash
 	b.Value = value
-	b.Header = NewHeader(height, ParentHash)
-	hashStr := string(b.Header.height) + string(b.Header.timestamp) + b.Header.ParentHash + string(b.Header.size) + b.Value
-	digest := makeSha256Digest(hashStr)
-	b.Header.hash = digest
+	b.Header = NewHeader(Height, ParentHash)
+	HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
+	digest := makeSha256Digest(HashStr)
+	b.Header.Hash = digest
 }
 
 // EncodeToJSON a block instance
 func (b *Block) EncodeToJSON() string {
 	// takes a block pointer and returns an json encoded string of the block
 	shape := JSONShape{
-		Height:     b.Header.height,
-		Timestamp:  b.Header.timestamp,
+		Nonce:      b.Header.Nonce,
+		Height:     b.Header.Height,
+		Timestamp:  b.Header.Timestamp,
 		ParentHash: b.Header.ParentHash,
-		Size:       b.Header.size,
-		Hash:       b.Header.hash,
+		Size:       b.Header.Size,
+		Hash:       b.Header.Hash,
 		Value:      b.Value,
 	}
 	var encoded []byte
@@ -111,11 +114,12 @@ func DecodeFromJSON(m string) *Block {
 	var shape JSONShape
 	json.Unmarshal([]byte(m), &shape)
 	h := &Header{
-		height:     shape.Height,
-		timestamp:  shape.Timestamp,
+		Nonce:      shape.Nonce,
+		Height:     shape.Height,
+		Timestamp:  shape.Timestamp,
 		ParentHash: shape.ParentHash,
-		size:       shape.Size,
-		hash:       shape.Hash,
+		Size:       shape.Size,
+		Hash:       shape.Hash,
 	}
 	b := &Block{Header: h, Value: shape.Value}
 	return b
@@ -132,11 +136,11 @@ func NewBlockChain() *BlockChain {
 	return &bc
 }
 
-//Get returns a blockchain instance's height
-func (bc *BlockChain) Get(height int32) []Block {
-	// takes an instance of a block chain and a height in int32
-	// returns a slice containing the blocks at that that height or nil
-	if val, ok := bc.Chain[height]; ok {
+//Get returns a blockchain instance's Height
+func (bc *BlockChain) Get(Height int32) []Block {
+	// takes an instance of a block chain and a Height in int32
+	// returns a slice containing the blocks at that that Height or nil
+	if val, ok := bc.Chain[Height]; ok {
 		return val
 	}
 	return nil
@@ -144,8 +148,8 @@ func (bc *BlockChain) Get(height int32) []Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
-	// takes a blockchain instance and inserts a block instance by height
-	val, ok := bc.Chain[b.Header.height]
+	// takes a blockchain instance and inserts a block instance by Height
+	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
@@ -153,12 +157,12 @@ func (bc *BlockChain) Insert(b Block) {
 			}
 		}
 	}
-	bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// } else {
-	// 	bc.Chain[b.Header.height] = append(bc.Chain[b.Header.height], b)
+	// 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// }
-	if b.Header.height+1 > bc.Length {
-		bc.Length = b.Header.height + 1
+	if b.Header.Height+1 > bc.Length {
+		bc.Length = b.Header.Height + 1
 	}
 }
 
@@ -189,8 +193,8 @@ func (bc *BlockChain) DecodeFromJSON(JSONBlocks []string) {
 
 func makeGenesisBlock() Block {
 	//creates and returns a genesis block
-	pHash := makeSha256Digest("hash this")
-	merkleRootDummy := makeSha256Digest("root_dummy_hash")
+	pHash := makeSha256Digest("Hash this")
+	merkleRootDummy := makeSha256Digest("root_dummy_Hash")
 	var b Block
 	b.Initialize(0, pHash, merkleRootDummy)
 	return b
@@ -199,7 +203,7 @@ func makeGenesisBlock() Block {
 // Testing utils and functions
 func printBlock(b *Block) {
 	// prints blocks fields for debugging and testing purposes only
-	h := "height: " + string(b.Header.height) + ", timestamp: " + string(b.Header.timestamp) + ", parent hash: " + b.Header.ParentHash + ", size" + string(b.Header.size)
+	h := "Height: " + string(b.Header.Height) + ", Timestamp: " + string(b.Header.Timestamp) + ", parent Hash: " + b.Header.ParentHash + ", Size" + string(b.Header.Size)
 	value := "Block Value: " + b.Value
 	fmt.Println(value)
 	fmt.Println(h)
@@ -215,17 +219,17 @@ func printStringSlice(slice []string) {
 }
 
 func makeTenBlocks() []Block {
-	// creates an array of 10 blocks of 6 different heights
-	// starts with a genesis block as the only block at height zero
-	heights := [9]int32{1, 1, 2, 2, 3, 3, 4, 4, 5}
+	// creates an array of 10 blocks of 6 different Heights
+	// starts with a genesis block as the only block at Height zero
+	Heights := [9]int32{1, 1, 2, 2, 3, 3, 4, 4, 5}
 	bZero := makeGenesisBlock()
 	var blocks []Block
 	blocks = append(blocks, bZero)
 	for i := 1; i < 10; i++ {
 		var b Block
-		// height := int32((i % 4) + 1)
-		// naive parent hash, not actually accurate to chain
-		b.Initialize(heights[i-1], blocks[i-1].Header.hash, "test block value")
+		// Height := int32((i % 4) + 1)
+		// naive parent Hash, not actually accurate to chain
+		b.Initialize(Heights[i-1], blocks[i-1].Header.Hash, "test block value")
 		blocks = append(blocks, b)
 	}
 	return blocks
@@ -233,8 +237,8 @@ func makeTenBlocks() []Block {
 
 // tests
 func main() {
-	//fmt.Println("Beggining of main")
-	//test3()
+	fmt.Println("Beggining of main")
+	test3()
 }
 
 func test2() {
