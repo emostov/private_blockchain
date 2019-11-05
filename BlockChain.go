@@ -10,8 +10,6 @@ type BlockChain struct {
 	Length int32 // length starts at 1
 }
 
-//BlockChain Methods and tools
-
 //NewBlockChain creates a new blockchain instance, initializing map
 func NewBlockChain() *BlockChain {
 	// use this to create and initializea block chain instance
@@ -74,6 +72,22 @@ func (bc *BlockChain) DecodeFromJSON(JSONBlocks []string) {
 		block := DecodeFromJSON(JSONB)
 		bc.Insert(*block)
 	}
+}
+
+// GetLatestBlock returns the list of blocks of height "BlockChain.length"
+func (bc *BlockChain) GetLatestBlock() []Block {
+	return bc.Chain[bc.Length]
+}
+
+// GetParentBlock takes a block as a parameter, and returns its parent block
+func (bc *BlockChain) GetParentBlock(b *Block) *Block {
+	parentHeightBlocks := bc.Get(b.Header.Height)
+	for _, pBlock := range parentHeightBlocks {
+		if pBlock.Header.Hash == b.Header.ParentHash {
+			return &pBlock
+		}
+	}
+	return nil
 }
 
 func makeGenesisBlock() Block {
