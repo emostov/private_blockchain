@@ -31,6 +31,7 @@ func (bc *BlockChain) Get(Height int32) []Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
+	target = "0000000000"
 	// takes a blockchain instance and inserts a block instance by Height
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
@@ -40,6 +41,13 @@ func (bc *BlockChain) Insert(b Block) {
 			}
 		}
 	}
+	parentHash := bc.GetParentBlock(b).Header.Hash
+	// check that it is a valid nonce
+	puzzleAnswer := makePuzzleAnswer(nonce, parentHash, b.Header.Value)
+	if !checkPuzzleAnswerValid(target, puzzleAnswer) {
+		return
+	}
+
 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// } else {
 	// 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
