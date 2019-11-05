@@ -27,34 +27,34 @@ import (
 // your function ReceiveHeartBeat(), stop trying nonce on the current block,
 // continue to the while loop by jumping to the step(2).
 
-func (bc *BlockChain)StartTryingNonces(){
+func (bc *BlockChain) StartTryingNonces() {
 	tryNonce := true
-	while tryNonce{
+	for tryNonce {
 		//turn tryNonce to false if recieve another block
 		// b := generateBlock
-		parentBlock := bc.GetLatestBlock[0]
+		parentBlock := bc.GetLatestBlock()[0]
 		parentHash := parentBlock.Header.Hash
 		var b Block
 		b.Initialize(bc.Length+1, parentHash, "test block value")
-		blockValue := b.Header.Value
+		blockValue := b.Value
 		target := "0000000000" // ten 0's
 		nonce := generateStartNonce(1)
-		
+
 		run := true
 		puzzleAnswer := ""
-		while run{
+		for run {
 			run = false
-			puzzleAnswer := makePuzzleAnswer(nonce, parentHash, blockValue )
-			if !checkPuzzleAnswerValid(target, puzzleAnswer){
+			puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
+			if !checkPuzzleAnswerValid(target, puzzleAnswer) {
 				nonce = generateNonce(nonce)
 				run = true
 			}
 		}
 		// Broadcast Node with new nonce with heartbeat data
 		// Or add recieved valid node to block chain
-		
+
 	}
-	
+
 }
 
 //Helper function for Start Trying Nonces
@@ -71,8 +71,8 @@ func generateNonce(previous string) string {
 	return newNonce
 }
 
-func generateStartNonce(number int) string {
-	return strconv.FormatInt(int64(previousPlusOne), 16)
+func generateStartNonce(seed int) string {
+	return strconv.FormatInt(int64(seed), 16)
 }
 
 func makePuzzleAnswer(nonce string, parentBlockHash string, blockValue string) string {
@@ -81,26 +81,17 @@ func makePuzzleAnswer(nonce string, parentBlockHash string, blockValue string) s
 	return puzzleAnswer
 }
 
-func checkPuzzleAnswerValid(target string, puzzleAnswer) bool{
+func checkPuzzleAnswerValid(target string, puzzleAnswer string) bool {
 	return target == puzzleAnswer[:len(target)]
 }
 
-type HeartBeatData struct{
-	id string // sender's id
-	address string // sender's address
-	blockJSON string
-	peerMapJSON string
-}
-
-func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData{
-	return *HeartBeatData{id, address, blockJSON}, peerMapJSON}
-}
-
-func (hbd *) EncodeToJson() string{
-	var encoded []byte
-	encoded, err := json.Marshal(hbd)
-	if err != nil {
-		fmt.Println("Error in Json Encoding, ", err)
-	}
-	return string(encoded)
-}
+// HeartBeatReceive()
+//  When a node receives a new block in HeartBeat, the node will first check if
+//  the parent block of this new block exists in its own blockchain (the previous
+// 	block is the block whose hash is the parentHash of the next block).
+// If the previous block doesn't exist, the node will ask any peer in PeerList at
+// "/block/{height}/{hash}" to download that block.
+// After making sure the previous block exists, insert the block from HeartBeatData
+//  to the current BlockChain.
+//  Alter this function so that when it receives a HeartBeatData with a new block,
+//  it verifies the nonce as described above.
