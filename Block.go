@@ -22,7 +22,6 @@ makeGenesisBlock() is useful for making an arbitrary genesis block for a
 Blockchain.
 */
 
-// general utils
 func makeSha256Digest(m string) string {
 	//takes a message string and returns a string of messages sh256 digest
 	h := sha512.New()
@@ -34,7 +33,7 @@ func makeSha256Digest(m string) string {
 //JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
-	Nonce      int32
+	Nonce      string
 	Height     int32
 	Timestamp  int64 // Unix Timestamp
 	ParentHash string
@@ -45,7 +44,7 @@ type JSONShape struct {
 
 //Header Struct describing the fields of the header
 type Header struct {
-	Nonce      int32
+	Nonce      string
 	Height     int32
 	Timestamp  int64 // Unix Timestamp
 	ParentHash string
