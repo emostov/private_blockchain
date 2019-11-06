@@ -29,9 +29,9 @@ func (bc *BlockChain) Get(Height int32) []Block {
 	return nil
 }
 
-//Insert inserts a block into a blockchain
+// //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
-	target := "0000000000"
+	// target := "0000000000"
 	// takes a blockchain instance and inserts a block instance by Height
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
@@ -41,19 +41,19 @@ func (bc *BlockChain) Insert(b Block) {
 			}
 		}
 	}
-	parentHash := bc.GetParentBlock(&b).Header.Hash
-	// check that it is a valid nonce
-	puzzleAnswer := makePuzzleAnswer(b.Header.Nonce, parentHash, b.Value)
-	if !checkPuzzleAnswerValid(target, puzzleAnswer) {
-		return
-	}
+	// parentHash := bc.GetParentBlock(&b).Header.Hash
+	// // check that it is a valid nonce
+	// puzzleAnswer := makePuzzleAnswer(b.Header.Nonce, parentHash, b.Value)
+	// if !checkPuzzleAnswerValid(target, puzzleAnswer) {
+	// 	return
+	// }
 
 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// } else {
 	// 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// }
-	if b.Header.Height+1 > bc.Length {
-		bc.Length = b.Header.Height + 1
+	if b.Header.Height > bc.Length {
+		bc.Length = b.Header.Height
 	}
 }
 
@@ -84,6 +84,8 @@ func (bc *BlockChain) DecodeFromJSON(JSONBlocks []string) {
 
 // GetLatestBlock returns the list of blocks of height "BlockChain.length"
 func (bc *BlockChain) GetLatestBlock() []Block {
+	// fmt.Println("Length of bc: ", bc.Length)
+	// fmt.Println("array of block at length", bc.Chain[bc.Length])
 	return bc.Chain[bc.Length]
 }
 
@@ -136,48 +138,8 @@ func makeTenBlocks() []Block {
 		var b Block
 		// Height := int32((i % 4) + 1)
 		// naive parent Hash, not actually accurate to chain
-		b.Initialize(Heights[i-1], blocks[i-1].Header.Hash, "test block value")
+		b.Initialize(Heights[1], blocks[i-1].Header.Hash, "test block value")
 		blocks = append(blocks, b)
 	}
 	return blocks
-}
-
-// tests
-func main() {
-	fmt.Println("Beggining of main")
-	test3()
-}
-
-func test2() {
-	// testing insertion of a block into the block chain
-	bc := NewBlockChain()
-	bc.Insert(makeGenesisBlock())
-	JSONBc := bc.EncodeToJSON()
-	printStringSlice(JSONBc)
-}
-
-func test3() {
-	// testing creating a blockchain, and block chain encoding and decoding
-	bc := NewBlockChain()
-	blocks := makeTenBlocks()
-	for _, b := range blocks {
-		bc.Insert(b)
-	}
-	JSONBc := bc.EncodeToJSON()
-	bc2 := NewBlockChain()
-	bc2.DecodeFromJSON(JSONBc)
-	JSONBc2 := bc2.EncodeToJSON()
-	printStringSlice(JSONBc2)
-	fmt.Println("Length of the block chain is : ", bc2.Length)
-}
-
-func test1() {
-	// test making a genesis block and encoding of a single block
-	bZero := makeGenesisBlock()
-	// printBlock(bZero)
-	encoded := bZero.EncodeToJSON()
-	//fmt.Println(encoded)
-	bZero2 := DecodeFromJSON(encoded)
-	printBlock(bZero2)
-	fmt.Println(bZero2.EncodeToJSON())
 }

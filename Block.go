@@ -117,3 +117,10 @@ func DecodeFromJSON(m string) *Block {
 	b := &Block{Header: h, Value: shape.Value}
 	return b
 }
+
+// SetNonce recomputes hash and sets nonce for block
+func (b *Block) SetNonce(nonce string) {
+	b.Header.Nonce = nonce
+	HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
+	digest := makeSha256Digest(HashStr)
+}

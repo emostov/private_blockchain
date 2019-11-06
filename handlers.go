@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/binary"
-	"encoding/hex"
+	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 )
 
@@ -27,6 +27,29 @@ import (
 // your function ReceiveHeartBeat(), stop trying nonce on the current block,
 // continue to the while loop by jumping to the step(2).
 
+func (bc *BlockChain) TestTryNonces() string {
+	parentBlock := bc.GetLatestBlock()[0]
+	fmt.Println(parentBlock)
+	parentHash := parentBlock.Header.Hash
+	var b Block
+	b.Initialize(bc.Length+1, parentHash, "test block value")
+	blockValue := b.Value
+	target := "000000" // six 0's
+	nonce := generateStartNonce(1)
+	run := true
+	puzzleAnswer := ""
+	for run {
+		run = false
+		puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
+		if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
+			nonce = generateNonce(nonce)
+			run = true
+		}
+	}
+	b.Header.Nonce = nonce
+	return nonce
+}
+
 func (bc *BlockChain) StartTryingNonces() {
 	tryNonce := true
 	for tryNonce {
@@ -42,13 +65,16 @@ func (bc *BlockChain) StartTryingNonces() {
 
 		run := true
 		puzzleAnswer := ""
-		for run {
+		for run == true {
 			run = false
 			puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
-			if !checkPuzzleAnswerValid(target, puzzleAnswer) {
-				nonce = generateNonce(nonce)
-				run = true
-			}
+			checkPuzzleAnswerValid(target, puzzleAnswer)
+			run = false
+			// if !(checkPuzzleAnswerValid(target, puzzleAnswer)) {
+			// 	nonce = generateNonce(nonce)
+			// 	fmt.Println("nonce is", nonce)
+			// 	run = true
+			// }
 		}
 		// Broadcast Node with new nonce with heartbeat data
 		// Or add recieved valid node to block chain
@@ -61,18 +87,20 @@ func (bc *BlockChain) StartTryingNonces() {
 
 // takes hexadecimal string, converts to int, adds 1 and converts back to int
 func generateNonce(previous string) string {
-	previousBinary, err := hex.DecodeString(previous)
+	previousInt, err := strconv.Atoi(previous)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("error in generateNonce", err)
 	}
-	previousInt := binary.BigEndian.Uint64(previousBinary)
-	previousPlusOne := previousInt + 1
-	newNonce := strconv.FormatInt(int64(previousPlusOne), 16)
+	// previousInt := binary.BigEndian.Uint64(previousBinary)
+	previousPlusOne := previousInt + 10
+	// fmt.Println("ppp", previousInt, previous)
+	newNonce := strconv.Itoa(previousPlusOne)
 	return newNonce
 }
 
 func generateStartNonce(seed int) string {
-	return strconv.FormatInt(int64(seed), 16)
+	str := strconv.Itoa(seed)
+	return str
 }
 
 func makePuzzleAnswer(nonce string, parentBlockHash string, blockValue string) string {
@@ -82,7 +110,16 @@ func makePuzzleAnswer(nonce string, parentBlockHash string, blockValue string) s
 }
 
 func checkPuzzleAnswerValid(target string, puzzleAnswer string) bool {
+	// fmt.Println("target: ", target, "puzzleAnswer ", puzzleAnswer)
 	return target == puzzleAnswer[:len(target)]
+}
+
+func handlers() {
+	router := mux.NewRouter().StrictSlash(true)
+}
+
+func Upload(w http.ResponseWriter, r *http.Request, bc *BlockChain) []Block {
+	return bc.EncodeToJson()
 }
 
 // HeartBeatReceive()
