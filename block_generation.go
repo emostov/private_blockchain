@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-var target = "000000" // six 0's
+var target = "00" // six 0's
 var run = true
 
 // StartTryingNonces(): This function starts a new thread that tries different
@@ -30,8 +30,9 @@ var run = true
 // continue to the while loop by jumping to the step(2).
 
 // StartTryingNonces ...
-func (bc *BlockChain) StartTryingNonces() string {
-	for {
+func (bc *BlockChain) StartTryingNonces() {
+	stop := false
+	for !stop {
 		parentBlock := bc.GetLatestBlock()[0]
 		fmt.Println(parentBlock)
 		parentHash := parentBlock.Header.Hash
@@ -47,9 +48,13 @@ func (bc *BlockChain) StartTryingNonces() string {
 			if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
 				nonce = generateNonce(nonce)
 				run = true
+				fmt.Println("Nonce not found")
 			} else {
 				b.Header.Nonce = nonce
+				fmt.Println("block generation:About to insert after nonce is found")
 				Bc.Insert(b)
+				// delete this line when running
+				stop = true
 			}
 		}
 
