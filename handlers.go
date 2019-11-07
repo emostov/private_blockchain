@@ -31,6 +31,8 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusOK)
 			w.Write(block.EncodeToJSON())
+			// check if parent exists
+			// if it doesnt ask for it?
 		}
 	} else {
 		w.WriteHeader(http.StatusNotFound)
