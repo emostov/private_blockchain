@@ -8,6 +8,8 @@ import (
 )
 
 var mutex = &sync.Mutex{}
+var target = "0000" // 5 0's
+var run = true
 
 func main() {
 
@@ -15,6 +17,8 @@ func main() {
 
 	router := NewRouter()
 	// go Bc.StartTryingNonces()
+	Bc.StartTryingNonces()
+	fmt.Println(Bc.Show())
 	Bc.StartTryingNonces()
 	fmt.Println(Bc.Show())
 	log.Fatal(http.ListenAndServe(":8080", router))

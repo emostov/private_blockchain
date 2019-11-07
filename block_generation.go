@@ -6,9 +6,6 @@ import (
 	"strconv"
 )
 
-var target = "00" // six 0's
-var run = true
-
 // StartTryingNonces(): This function starts a new thread that tries different
 // nonces to generate new blocks. Nonce is a string of 16 hexes such as
 // "1f7b169c846f218a". Initialize the rand when you start a new node with
@@ -48,7 +45,7 @@ func (bc *BlockChain) StartTryingNonces() {
 			if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
 				nonce = generateNonce(nonce)
 				run = true
-				fmt.Println("Nonce not found")
+				// fmt.Println("Nonce not found")
 			} else {
 				b.Header.Nonce = nonce
 				fmt.Println("block generation:About to insert after nonce is found")
@@ -57,9 +54,8 @@ func (bc *BlockChain) StartTryingNonces() {
 				stop = true
 			}
 		}
-
+		run = true
 	}
-
 }
 
 //Helper function for Start Trying Nonces
