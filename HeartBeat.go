@@ -20,6 +20,8 @@ type PeerList struct {
 	length  int32
 }
 
+var genesis = makeGenesisBlock()
+
 // NewHeartBeatData creates instance of heart beat
 func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}

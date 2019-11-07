@@ -4,32 +4,53 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 )
 
+// Bc is the blochain instance
+var Bc = NewBlockChain()
 var mutex = &sync.Mutex{}
 var target = "0000" // 5 0's
-var run = true
+var run = true      // for loop conditional in StartTryingNonces()
+var id = "6688"
+var peerids = []string{"8080"}
+var peerlist = PeerList{selfid: id, peerIDs: peerids, length: Bc.Length}
 
 func main() {
+	go miner1()
+	miner2()
+}
+func miner1() {
 
 	testSetup()
 
-	router := NewRouter()
+	//router := NewRouter()
 	// go Bc.StartTryingNonces()
 	Bc.StartTryingNonces()
 	fmt.Println(Bc.Show())
+	router := NewRouter()
+	if len(os.Args) > 1 {
+		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
+	} else {
+		log.Fatal(http.ListenAndServe(":6689", router))
+	}
+}
+
+func miner2() {
+
+	testSetup()
+
+	//router := NewRouter()
+	// go Bc.StartTryingNonces()
 	Bc.StartTryingNonces()
 	fmt.Println(Bc.Show())
-	log.Fatal(http.ListenAndServe(":8080", router))
-
-	// router := mux.NewRouter().StrictSlash(true)
-	// router.HandleFunc("/Upload", Upload)
-	// router.HandleFunc("/block/{height}/{hash}", AskForBlock)
-	// router.HandleFunc("/Show", ShowHandler)
-	// router.HandleFunc("/heartbeat/recieve", HeartBeatRecieve)
-	// log.Fatal(http.ListenAndServe(":8080", router))
-
+	router := NewRouter()
+	if len(os.Args) > 1 {
+		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
+	} else {
+		log.Fatal(http.ListenAndServe(":8080", router))
+	}
 }
 
 func testSetup() {

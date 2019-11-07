@@ -2,15 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
-
-// Bc is the blochain instance
-var Bc = NewBlockChain()
 
 // Upload ...
 func Upload(w http.ResponseWriter, r *http.Request) {
@@ -23,50 +21,61 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	h := vars["height"]
 	hash := vars["hash"]
-	// height, err := strconv.Atoi(h)
+	height, err := strconv.Atoi(h)
 
-	// if err == nil {
-	// 	block := Bc.GetBlock(int32(height), hash)
-	// 	if block == nil {
-	// 		w.WriteHeader(http.StatusNotFound)
-	// 		// Ask for parent block, insert current block into tree
-	// 	} else {
-	// 		w.WriteHeader(http.StatusOK)
-	// 		w.Write(block.EncodeToJSON())
-	// 	}
-	// } else {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// }
+	if err == nil {
+		block := Bc.GetBlock(int32(height), hash)
+		if block == nil {
+			w.WriteHeader(http.StatusNotFound)
+			// Ask for parent block, insert current block into tree
+		} else {
+			w.WriteHeader(http.StatusOK)
+			w.Write(block.EncodeToJSON())
+		}
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 
 	w.Write([]byte("height :" + h + ", hash: " + hash))
 }
 
 // HeartBeatRecieve ...
 func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		body, err := ioutil.ReadAll(r.Body)
+
+	if r.Method == http.MethodPost {
+
+		requestBody, err := readRequestBody(r)
 		if err != nil {
-			http.Error(w, "Error reading request body",
-				http.StatusInternalServerError)
+			w.WriteHeader(http.StatusBadRequest)
 		}
-		// results = append(results, string(body))
+		w.WriteHeader(http.StatusOK)
+		// sb := strings.Builder{}
+		// sb.WriteString("In simple post, received request body is: \n")
+		// sb.WriteString(requestBody)
 		mutex.Lock()
+		w.Write([]byte("In HeartBeat Recieve  "))
 		run = false
-		fmt.Println(string(body))
-		// this is WRONG will be in form of heartbeat data
-		s := string(body)
+		s := string(requestBody)
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
+		_, _ = w.Write([]byte(requestBody))
 		block := DecodeFromJSON(string(data.blockJSON))
 		if verifyNonce(block) {
 			Bc.Insert(*block)
 		}
 		mutex.Unlock()
-		fmt.Fprint(w, "POST done")
-	} else {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
+	w.WriteHeader(http.StatusMethodNotAllowed)
 
+}
+
+func readRequestBody(r *http.Request) (string, error) {
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return "", errors.New("cannot read request body")
+	}
+	defer r.Body.Close()
+	return string(reqBody), nil
 }
 
 // ShowHandler ...
