@@ -51,6 +51,17 @@ func miner2() {
 	} else {
 		log.Fatal(http.ListenAndServe(":8080", router))
 	}
+
+	// resp, error := http.Get("http://localhost:6689/block/0/d7c768e1ac640682475a2a6ed935d788e2f8f5fb2c14e9927e97a9fcbb69a7b7386b9b2f6993548bb5a2de899054d4a8428ec40116be12ca872cfcedb0cf6bdc")
+	// if error != nil {
+	// 	log.Fatalln(error)
+	// }
+	// body, error := ioutil.ReadAll(resp.Body)
+	// if error != nil {
+	// 	log.Fatalln(error)
+	// }
+	// fmt.Println("miner2 got ", body)
+
 }
 
 func testSetup() {
