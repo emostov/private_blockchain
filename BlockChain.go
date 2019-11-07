@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -29,7 +30,20 @@ func (bc *BlockChain) Get(Height int32) []Block {
 	return nil
 }
 
-// //Insert inserts a block into a blockchain
+// GetBlock ...
+func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
+	blocksAtHeight := bc.Get(height)
+	if blocksAtHeight != nil {
+		for _, block := range blocksAtHeight {
+			if block.Header.Hash == hash {
+				return &block
+			}
+		}
+	}
+	return nil
+}
+
+//Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
 	// target := "0000000000"
 	// takes a blockchain instance and inserts a block instance by Height
@@ -71,15 +85,51 @@ func (bc *BlockChain) EncodeToJSON() []string {
 	return JSONBlocks
 }
 
+//EncodeBlockchainToJSON encodes all blocks in chain and puts them into a slice
+func EncodeBlockchainToJSON(bc *BlockChain) string {
+	// takes a block chain instance and creates a slice of json block Data
+	// returns a the slice of json blocks
+	var JSONBlocks string
+	JSONBlocks = "["
+	for _, blockSlice := range bc.Chain {
+		for _, block := range blockSlice {
+			encodedBlock := block.EncodeToJSON()
+			JSONBlocks += encodedBlock
+			JSONBlocks += ","
+		}
+	}
+	JSONBlocks = JSONBlocks[:len(JSONBlocks)-1]
+	JSONBlocks += "]"
+	return JSONBlocks
+}
+
 // DecodeFromJSON takes a blockchain instance and a list of json blocks
 // and inserts each block into the blochchain instance
-func (bc *BlockChain) DecodeFromJSON(JSONBlocks []string) {
+// func (bc *BlockChain) DecodeFromJSON(JSONBlocks string) {
+// 	//takes a blockchain instance and a list of json blocks and inserts each block
+// 	// into the blochchain instance
+// 	//JSONBlocks = []Block(JSONBlocks)
+// 	for _, JSONB := range JSONBlocks {
+// 		block := DecodeFromJSON(JSONB)
+// 		bc.Insert(*block)
+// 	}
+// }
+
+//DecodeBlockchainFromJSON ...
+func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	//takes a blockchain instance and a list of json blocks and inserts each block
 	// into the blochchain instance
-	for _, JSONB := range JSONBlocks {
-		block := DecodeFromJSON(JSONB)
-		bc.Insert(*block)
+	blockList := []Block{}
+	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
+	if err == nil {
+		for _, JSONB := range blockList {
+			// block := DecodeFromJSON(JSONB)
+			// bc.Insert(*block)
+			bc.Insert(JSONB)
+		}
+
 	}
+
 }
 
 // GetLatestBlock returns the list of blocks of height "BlockChain.length"

@@ -1,1 +1,0 @@
-//  The synchronized version of GetLatestBlocks() and GetParentBlock().

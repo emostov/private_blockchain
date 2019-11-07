@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"sort"
@@ -54,7 +55,7 @@ func (blockchain *BlockChain) Show() string {
 		}
 		rs += "\n"
 	}
-	sum := sha3.Sum256([]byte(rs))
+	sum := sha256.Sum256([]byte(rs))
 	rs = fmt.Sprintf("This is the BlockChain: %s\n", hex.EncodeToString(sum[:])) + rs
 	return rs
 }

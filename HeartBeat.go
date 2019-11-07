@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// HeartBeatData stores bc and node information to send
 type HeartBeatData struct {
 	id          string // sender's id
 	address     string // sender's address
@@ -12,11 +13,13 @@ type HeartBeatData struct {
 	peerMapJSON string
 }
 
+// NewHeartBeatData creates instance of heart beat
 func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}
 }
 
-func (hbd *HeartBeatData) EncodeToJson() string {
+// EncodeToJSON converts heart beat data to json string
+func (hbd *HeartBeatData) EncodeToJSON() string {
 	var encoded []byte
 	encoded, err := json.Marshal(hbd)
 	if err != nil {

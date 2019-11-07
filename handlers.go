@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // StartTryingNonces(): This function starts a new thread that tries different
@@ -27,6 +29,7 @@ import (
 // your function ReceiveHeartBeat(), stop trying nonce on the current block,
 // continue to the while loop by jumping to the step(2).
 
+// TestTryNonces ...
 func (bc *BlockChain) TestTryNonces() string {
 	parentBlock := bc.GetLatestBlock()[0]
 	fmt.Println(parentBlock)
@@ -47,9 +50,11 @@ func (bc *BlockChain) TestTryNonces() string {
 		}
 	}
 	b.Header.Nonce = nonce
+	bc.Insert(b)
 	return nonce
 }
 
+// StartTryingNonces ...
 func (bc *BlockChain) StartTryingNonces() {
 	tryNonce := true
 	for tryNonce {
@@ -60,7 +65,7 @@ func (bc *BlockChain) StartTryingNonces() {
 		var b Block
 		b.Initialize(bc.Length+1, parentHash, "test block value")
 		blockValue := b.Value
-		target := "0000000000" // ten 0's
+		target := "00000" // ten 0's
 		nonce := generateStartNonce(1)
 
 		run := true
@@ -91,9 +96,9 @@ func generateNonce(previous string) string {
 	if err != nil {
 		log.Fatal("error in generateNonce", err)
 	}
-	// previousInt := binary.BigEndian.Uint64(previousBinary)
+
 	previousPlusOne := previousInt + 10
-	// fmt.Println("ppp", previousInt, previous)
+
 	newNonce := strconv.Itoa(previousPlusOne)
 	return newNonce
 }
@@ -114,13 +119,62 @@ func checkPuzzleAnswerValid(target string, puzzleAnswer string) bool {
 	return target == puzzleAnswer[:len(target)]
 }
 
-func handlers() {
-	router := mux.NewRouter().StrictSlash(true)
+// Handlers Below
+
+// func handlers() {
+// 	router := mux.NewRouter().StrictSlash(true)
+// }
+
+// Bc is the blochain instance
+var Bc = NewBlockChain()
+var blocks = makeTenBlocks()
+
+func testSetup() {
+	Bc.Insert(blocks[0])
 }
 
-func Upload(w http.ResponseWriter, r *http.Request, bc *BlockChain) []Block {
-	return bc.EncodeToJson()
+// Upload ...
+func Upload(w http.ResponseWriter, r *http.Request) {
+
+	// fmt.Println(Bc.EncodeToJSON())
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusServiceUnavailable)
+	// }
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(EncodeBlockchainToJSON(Bc)))
+
 }
+
+// AskForBlock ...
+func AskForBlock(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	h := vars["height"]
+	hash := vars["hash"]
+	height, err := strconv.Atoi(h)
+	if err == nil {
+		parentBlock := Bc.GetBlock(int32(height), hash)
+		if parentBlock == nil {
+			w.WriteHeader(http.StatusNotFound)
+			// Ask for parent block, insert current block into tree
+		}
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
+	w.Write([]byte("height :" + string(height) + ", hash: " + hash))
+}
+
+// ShowHandler ...
+func ShowHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(Bc.Show()))
+}
+
+// func HeartBeatRecieve() (w http.ResponseWriter, r *http.Request) {
+
+// }
 
 // HeartBeatReceive()
 //  When a node receives a new block in HeartBeat, the node will first check if
@@ -132,3 +186,15 @@ func Upload(w http.ResponseWriter, r *http.Request, bc *BlockChain) []Block {
 //  to the current BlockChain.
 //  Alter this function so that when it receives a HeartBeatData with a new block,
 //  it verifies the nonce as described above.
+
+/////////////
+
+// type stringArray struct {
+// 	strArray []string `json:"strArray"`
+// }
+
+// func NewStringArray() stringArray {
+// 	return stringArray{
+// 		make([]string, 0),
+// 	}
+// }
