@@ -8,17 +8,15 @@ import (
 )
 
 var mutex = &sync.Mutex{}
-var recieved = false
 
 func main() {
 	//fmt.Println("Beggining of main")
 	//test4()
 	testSetup()
-	// test3()
 	fmt.Println(Bc.Show())
 
 	router := NewRouter()
-
+	go Bc.StartTryingNonces()
 	log.Fatal(http.ListenAndServe(":8080", router))
 	// router := mux.NewRouter().StrictSlash(true)
 	// router.HandleFunc("/Upload", Upload)
@@ -29,9 +27,8 @@ func main() {
 
 }
 
-var blocks = makeTenBlocks()
-
 func testSetup() {
+	var blocks = makeTenBlocks()
 	Bc.Insert(blocks[0])
 	Bc.Insert(blocks[1])
 	Bc.Insert(blocks[1])

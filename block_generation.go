@@ -29,8 +29,8 @@ var run = true
 // your function ReceiveHeartBeat(), stop trying nonce on the current block,
 // continue to the while loop by jumping to the step(2).
 
-// TestTryNonces ...
-func (bc *BlockChain) TestTryNonces() string {
+// StartTryingNonces ...
+func (bc *BlockChain) StartTryingNonces() string {
 	for {
 		parentBlock := bc.GetLatestBlock()[0]
 		fmt.Println(parentBlock)
@@ -54,11 +54,6 @@ func (bc *BlockChain) TestTryNonces() string {
 		}
 
 	}
-
-}
-
-// StartTryingNonces ...
-func (bc *BlockChain) StartTryingNonces() {
 
 }
 
