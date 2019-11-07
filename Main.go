@@ -5,19 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
-
-	"./uri"
 )
 
 // Bc is the blochain instance
 
-var mutex = &sync.Mutex{}
-var target = "0000" // 5 0's
-var run = true      // for loop conditional in StartTryingNonces()
-var id = "6688"
-var peerids = []string{"8080"}
-var peerlist = PeerList{selfid: id, peerIDs: peerids, length: Bc.Length}
+// var id = "6688"
+// var peerids = []string{"8080"}
+// var peerlist = PeerList{selfid: id, peerIDs: peerids, length: Bc.Length}
 
 func main() {
 	go miner1()
@@ -30,8 +24,8 @@ func miner1() {
 	//router := NewRouter()
 	// go Bc.StartTryingNonces()
 	Bc.StartTryingNonces()
-	fmt.Println(handlers.Bc.Show())
-	router := uri.NewRouter()
+	fmt.Println(Bc.Show())
+	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {

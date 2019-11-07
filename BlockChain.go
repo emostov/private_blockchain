@@ -45,7 +45,7 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
-	mutex.Lock()
+	//mutex.Lock()
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -62,7 +62,7 @@ func (bc *BlockChain) Insert(b Block) {
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
-	mutex.Unlock()
+	//mutex.Unlock()
 	fmt.Println("Insert Success")
 }
 

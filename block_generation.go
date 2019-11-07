@@ -27,6 +27,10 @@ import (
 // continue to the while loop by jumping to the step(2).
 
 // StartTryingNonces ...
+var run = true
+var target = "0000"
+
+// StartTryingNonces ...
 func (bc *BlockChain) StartTryingNonces() {
 	stop := false
 	for !stop {

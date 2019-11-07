@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"encoding/json"
@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Bc ...
 var Bc = NewBlockChain()
 
 // Upload ...
@@ -56,18 +57,18 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// sb := strings.Builder{}
 		// sb.WriteString("In simple post, received request body is: \n")
 		// sb.WriteString(requestBody)
-		mutex.Lock()
+		//mutex.Lock()
 		w.Write([]byte("In HeartBeat Recieve  "))
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		block := Block.DecodeFromJSON(string(data.blockJSON))
+		block := DecodeFromJSON(string(data.blockJSON))
 		if verifyNonce(block) {
 			Bc.Insert(*block)
 		}
-		mutex.Unlock()
+		//mutex.Unlock()
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)
 
