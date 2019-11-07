@@ -2,33 +2,44 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"sync"
 )
 
-// tests
+var mutex = &sync.Mutex{}
+var recieved = false
+
 func main() {
 	//fmt.Println("Beggining of main")
 	//test4()
 	testSetup()
-	test3()
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/Upload", Upload)
-	router.HandleFunc("/block/{height}/{hash}", AskForBlock)
-	router.HandleFunc("/Show", ShowHandler)
+	// test3()
+	fmt.Println(Bc.Show())
+
+	router := NewRouter()
+
 	log.Fatal(http.ListenAndServe(":8080", router))
+	// router := mux.NewRouter().StrictSlash(true)
+	// router.HandleFunc("/Upload", Upload)
+	// router.HandleFunc("/block/{height}/{hash}", AskForBlock)
+	// router.HandleFunc("/Show", ShowHandler)
+	// router.HandleFunc("/heartbeat/recieve", HeartBeatRecieve)
+	// log.Fatal(http.ListenAndServe(":8080", router))
 
 }
 
-//Index ..
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+var blocks = makeTenBlocks()
+
+func testSetup() {
+	Bc.Insert(blocks[0])
+	Bc.Insert(blocks[1])
+	Bc.Insert(blocks[1])
 }
+
 func test4() {
 	bc := NewBlockChain()
+
 	blocks := makeTenBlocks()
 	for _, b := range blocks {
 		bc.Insert(b)
@@ -51,6 +62,7 @@ func test3() {
 	// testing creating a blockchain, and block chain encoding and decoding
 	bc := NewBlockChain()
 	blocks := makeTenBlocks()
+	bc.Show()
 	for _, b := range blocks {
 		bc.Insert(b)
 	}

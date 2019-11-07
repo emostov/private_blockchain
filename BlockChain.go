@@ -45,8 +45,7 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
-	// target := "0000000000"
-	// takes a blockchain instance and inserts a block instance by Height
+	mutex.Lock()
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -55,12 +54,6 @@ func (bc *BlockChain) Insert(b Block) {
 			}
 		}
 	}
-	// parentHash := bc.GetParentBlock(&b).Header.Hash
-	// // check that it is a valid nonce
-	// puzzleAnswer := makePuzzleAnswer(b.Header.Nonce, parentHash, b.Value)
-	// if !checkPuzzleAnswerValid(target, puzzleAnswer) {
-	// 	return
-	// }
 
 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 	// } else {
@@ -69,6 +62,7 @@ func (bc *BlockChain) Insert(b Block) {
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
+	mutex.Unlock()
 }
 
 //EncodeToJSON encodes all blocks in chain and puts them into a slice
@@ -178,7 +172,7 @@ func printStringSlice(slice []string) {
 }
 
 func makeTenBlocks() []Block {
-	// creates an array of 10 blocks of 6 different Heights
+	// creates an array of  blocks of the same
 	// starts with a genesis block as the only block at Height zero
 	Heights := [9]int32{1, 1, 2, 2, 3, 3, 4, 4, 5}
 	bZero := makeGenesisBlock()
@@ -188,7 +182,7 @@ func makeTenBlocks() []Block {
 		var b Block
 		// Height := int32((i % 4) + 1)
 		// naive parent Hash, not actually accurate to chain
-		b.Initialize(Heights[1], blocks[i-1].Header.Hash, "test block value")
+		b.Initialize(Heights[1], bZero.Header.Hash, "test block value")
 		blocks = append(blocks, b)
 	}
 	return blocks

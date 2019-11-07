@@ -13,6 +13,13 @@ type HeartBeatData struct {
 	peerMapJSON string
 }
 
+// PeerList ...
+type PeerList struct {
+	selfid  string
+	peerIDs []string
+	length  int32
+}
+
 // NewHeartBeatData creates instance of heart beat
 func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}
