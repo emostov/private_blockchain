@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"os"
 	"sync"
+
+	"./uri"
 )
 
 // Bc is the blochain instance
-var Bc = NewBlockChain()
+
 var mutex = &sync.Mutex{}
 var target = "0000" // 5 0's
 var run = true      // for loop conditional in StartTryingNonces()
@@ -28,8 +30,8 @@ func miner1() {
 	//router := NewRouter()
 	// go Bc.StartTryingNonces()
 	Bc.StartTryingNonces()
-	fmt.Println(Bc.Show())
-	router := NewRouter()
+	fmt.Println(handlers.Bc.Show())
+	router := uri.NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {

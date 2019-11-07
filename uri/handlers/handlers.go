@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -9,6 +9,8 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+var Bc = NewBlockChain()
 
 // Upload ...
 func Upload(w http.ResponseWriter, r *http.Request) {
@@ -56,12 +58,12 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// sb.WriteString(requestBody)
 		mutex.Lock()
 		w.Write([]byte("In HeartBeat Recieve  "))
-		run = false
+		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		block := DecodeFromJSON(string(data.blockJSON))
+		block := Block.DecodeFromJSON(string(data.blockJSON))
 		if verifyNonce(block) {
 			Bc.Insert(*block)
 		}
