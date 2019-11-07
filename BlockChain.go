@@ -79,7 +79,7 @@ func (bc *BlockChain) EncodeToJSON() []string {
 	for _, blockSlice := range bc.Chain {
 		for _, block := range blockSlice {
 			encodedBlock := block.EncodeToJSON()
-			JSONBlocks = append(JSONBlocks, encodedBlock)
+			JSONBlocks = append(JSONBlocks, string(encodedBlock))
 		}
 	}
 	return JSONBlocks
@@ -94,7 +94,7 @@ func EncodeBlockchainToJSON(bc *BlockChain) string {
 	for _, blockSlice := range bc.Chain {
 		for _, block := range blockSlice {
 			encodedBlock := block.EncodeToJSON()
-			JSONBlocks += encodedBlock
+			JSONBlocks += string(encodedBlock)
 			JSONBlocks += ","
 		}
 	}

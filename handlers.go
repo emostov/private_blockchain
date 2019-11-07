@@ -154,10 +154,13 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 	height, err := strconv.Atoi(h)
 	if err == nil {
-		parentBlock := Bc.GetBlock(int32(height), hash)
-		if parentBlock == nil {
+		block := Bc.GetBlock(int32(height), hash)
+		if block == nil {
 			w.WriteHeader(http.StatusNotFound)
 			// Ask for parent block, insert current block into tree
+		} else {
+			w.WriteHeader(http.StatusOK)
+			w.Write(block.EncodeToJSON())
 		}
 	} else {
 		w.WriteHeader(http.StatusNotFound)

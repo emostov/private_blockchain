@@ -82,7 +82,7 @@ func (b *Block) Initialize(Height int32, ParentHash string, value string) {
 }
 
 // EncodeToJSON a block instance
-func (b *Block) EncodeToJSON() string {
+func (b *Block) EncodeToJSON() []byte {
 	// takes a block pointer and returns an json encoded string of the block
 	shape := JSONShape{
 		Nonce:      b.Header.Nonce,
@@ -98,7 +98,8 @@ func (b *Block) EncodeToJSON() string {
 	if err != nil {
 		fmt.Println("Error in Json Encoding, ", err)
 	}
-	return string(encoded)
+	///return string(encoded)
+	return encoded
 }
 
 //DecodeFromJSON takes a json string of a block and converts into a block instance
