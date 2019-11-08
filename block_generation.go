@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 )
 
@@ -46,6 +48,24 @@ func (bc *BlockChain) StartTryingNonces() {
 }
 
 //Helper function for Start Trying Nonces
+
+// SendHeartBeat ...
+func SendHeartBeat(blockJSON string) {
+	peerMapJSON, err := PEERLIST.PeerListToJSON()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	HBData := NewHeartBeatData(SELFID, SELFADDRESS, blockJSON, string(peerMapJSON))
+	HBDataJSON, _ := HBData.HBDataToJSON()
+	for _, id := range PEERLIST.peerIDs {
+		fmt.Println("Sending message to peer", string(id[0]+id[1]))
+		resp, err := http.Post(string(id[0]+id[1]), "application/json", bytes.NewBuffer(HBDataJSON))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(resp)
+	}
+}
 
 // takes int string, converts to int, adds 1 and converts back to int string
 func generateNonce(previous string) string {

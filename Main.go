@@ -9,58 +9,41 @@ import (
 
 // Bc is the blochain instance
 
-// var id = "6688"
-// var peerids = []string{"8080"}
-// var peerlist = PeerList{selfid: id, peerIDs: peerids, length: Bc.Length}
+// other port to use 8080 switch self id and peer id 8080
+
+var peerID = []string{"http://localhost:6689"}
+
+// PEERLIST right now is just hard coded
+var PEERLIST = PeerList{selfID: SELFID, peerIDs: peerID, length: Bc.Length}
+
+// SELFID ...
+var SELFID = []string{"http://localhost:", "8080"}
+
+// SELFADDRESS ...
+var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
 	miner1()
-	// miner2()
 }
 func miner1() {
 
-	testSetup()
+	testSetupBlockInsert()
 
 	//router := NewRouter()
 	// go Bc.StartTryingNonces()
 	Bc.StartTryingNonces()
+
 	fmt.Println(Bc.Show())
+	fmt.Println("I am at port ", SELFID[1])
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {
-		log.Fatal(http.ListenAndServe(":6689", router))
+		log.Fatal(http.ListenAndServe(":"+SELFID[1], router))
 	}
 }
 
-func miner2() {
-
-	testSetup()
-
-	//router := NewRouter()
-	// go Bc.StartTryingNonces()
-	Bc.StartTryingNonces()
-	fmt.Println(Bc.Show())
-	router := NewRouter()
-	if len(os.Args) > 1 {
-		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
-	} else {
-		log.Fatal(http.ListenAndServe(":8080", router))
-	}
-
-	// resp, error := http.Get("http://localhost:6689/block/0/d7c768e1ac640682475a2a6ed935d788e2f8f5fb2c14e9927e97a9fcbb69a7b7386b9b2f6993548bb5a2de899054d4a8428ec40116be12ca872cfcedb0cf6bdc")
-	// if error != nil {
-	// 	log.Fatalln(error)
-	// }
-	// body, error := ioutil.ReadAll(resp.Body)
-	// if error != nil {
-	// 	log.Fatalln(error)
-	// }
-	// fmt.Println("miner2 got ", body)
-
-}
-
-func testSetup() {
+func testSetupBlockInsert() {
 	var blocks = makeTenBlocks()
 	Bc.Insert(blocks[0])
 	Bc.Insert(blocks[1])

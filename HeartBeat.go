@@ -2,29 +2,53 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
 // HeartBeatData stores bc and node information to send
 type HeartBeatData struct {
-	id          string // sender's id
-	address     string // sender's address
-	blockJSON   string
-	peerMapJSON string
+	ID          []string // sender's id
+	Address     string   // sender's address
+	BlockJSON   string
+	PeerMapJSON string
 }
 
 // PeerList ...
 type PeerList struct {
-	selfid  string
+	selfID  []string
 	peerIDs []string
 	length  int32
 }
 
+// type selfID struct {
+// 	ipaddress string
+// 	port      string
+// }
+
 var genesis = makeGenesisBlock()
 
 // NewHeartBeatData creates instance of heart beat
-func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
+func NewHeartBeatData(id []string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}
+}
+
+// HBDataToJSON ...
+func (hbd *HeartBeatData) HBDataToJSON() ([]byte, error) {
+	value, err := json.Marshal(hbd)
+	if err != nil {
+		return []byte{}, errors.New("Cannot encode HBData ßto Json")
+	}
+	return value, nil
+}
+
+// PeerListToJSON ....
+func (pl *PeerList) PeerListToJSON() ([]byte, error) {
+	value, err := json.Marshal(pl)
+	if err != nil {
+		return []byte{}, errors.New("Cannot encode PeerList to Json")
+	}
+	return value, nil
 }
 
 // EncodeToJSON converts heart beat data to json string

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -54,17 +55,16 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		}
 		w.WriteHeader(http.StatusOK)
-		// sb := strings.Builder{}
-		// sb.WriteString("In simple post, received request body is: \n")
-		// sb.WriteString(requestBody)
+
 		//mutex.Lock()
 		w.Write([]byte("In HeartBeat Recieve  "))
+		fmt.Println("IM an id and am getting a post", SELFID[1])
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		block := DecodeFromJSON(string(data.blockJSON))
+		block := DecodeFromJSON(string(data.BlockJSON))
 		if verifyNonce(block) {
 			Bc.Insert(*block)
 		}
@@ -73,6 +73,9 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusMethodNotAllowed)
 
 }
+
+// make function that sends out heartbeat data with a post request
+// HeartBeatSend()
 
 func readRequestBody(r *http.Request) (string, error) {
 	reqBody, err := ioutil.ReadAll(r.Body)
