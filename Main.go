@@ -14,8 +14,8 @@ import (
 // var peerlist = PeerList{selfid: id, peerIDs: peerids, length: Bc.Length}
 
 func main() {
-	go miner1()
-	miner2()
+	miner1()
+	// miner2()
 }
 func miner1() {
 

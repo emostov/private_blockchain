@@ -56,9 +56,7 @@ func (bc *BlockChain) Insert(b Block) {
 	}
 
 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
-	// } else {
-	// 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
-	// }
+
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
@@ -129,8 +127,7 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 
 // GetLatestBlock returns the list of blocks of height "BlockChain.length"
 func (bc *BlockChain) GetLatestBlock() []Block {
-	// fmt.Println("Length of bc: ", bc.Length)
-	// fmt.Println("array of block at length", bc.Chain[bc.Length])
+
 	return bc.Chain[bc.Length]
 }
 
