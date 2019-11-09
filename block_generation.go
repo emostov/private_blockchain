@@ -39,7 +39,7 @@ func (bc *BlockChain) StartTryingNonces() {
 					b.Header.Nonce = nonce
 					fmt.Println("block generation:About to insert after nonce is found")
 					Bc.Insert(b)
-					SendHeartBeat(string(b.EncodeToJSON()))
+					//SendHeartBeat(string(b.EncodeToJSON()))
 					// delete this line when running
 					//stop = true
 					//mutex.Unlock()
@@ -80,7 +80,7 @@ func askForParent(parentHash string, height string) bool {
 		return false
 	}
 	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("sending get reques", string(id))
+		fmt.Println("sending get request in askForParent", string(id))
 		resp, err := http.Get(string(id) + "/block/" + height + "/" + parentHash)
 		if err != nil {
 			log.Fatalln(err)
@@ -90,20 +90,27 @@ func askForParent(parentHash string, height string) bool {
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("11asking for another parent block")
 		if resp.StatusCode != http.StatusNotFound {
 			b := DecodeFromJSON(string(body))
+			fmt.Println("block string is ", string(body))
+			fmt.Println("block json is", string(b.EncodeToJSON()))
+
 			result := Bc.GetBlock(b.Header.Height, b.Header.Hash)
 			if result != nil {
+				fmt.Println("askForParent succeses: ", b.Header.Hash)
 				Bc.Insert(*b)
 				return true
 			}
-			strheight := strconv.Itoa(int(b.Header.Height))
+			fmt.Println("asking for another parent block")
+			strheight := strconv.Itoa(int(b.Header.Height - 1))
 			if askForParent(b.Header.ParentHash, strheight) {
 				Bc.Insert(*b)
 			}
 		}
 
 	}
+	fmt.Println("ask for parent does not work")
 	return false
 }
 

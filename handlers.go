@@ -29,7 +29,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 	h := vars["height"]
 	hash := vars["hash"]
 	height, err := strconv.ParseInt(h, 10, 64)
-
+	fmt.Println("i am ", SELFID, " ask get", "height :"+h+", hash: "+hash)
 	if err == nil {
 		block := Bc.GetBlock(int32(height), hash)
 		if block == nil {
@@ -46,7 +46,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 	// 	w.WriteHeader(http.StatusNotFound)
 	// }
 
-	w.Write([]byte("height :" + h + ", hash: " + hash))
+	//w.Write([]byte("height :" + h + ", hash: " + hash))
 }
 
 // HeartBeatRecieve ...

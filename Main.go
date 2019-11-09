@@ -34,6 +34,7 @@ func miner1() {
 	Bc.StartTryingNonces()
 
 	fmt.Println(Bc.Show())
+	testAsk()
 	fmt.Println("I am at port ", SELFID[1])
 	router := NewRouter()
 	if len(os.Args) > 1 {
@@ -63,6 +64,10 @@ func test4() {
 
 }
 
+func testAsk() {
+	askForParent("97611bc0a6e098f600d4c776252ffc16173058b4d5e2ae4a7d336fe18eb7f11326b2ca4e40be4c5572800ca76c6cdf4b65931b297f098f73a256f497c8907736", "1")
+}
+
 // func test2() {
 // 	// testing insertion of a block into the block chain
 // 	bc := NewBlockChain()
@@ -80,11 +85,4 @@ func test3() {
 		bc.Insert(b)
 	}
 	fmt.Println(bc.Show())
-	// JSONBc := EncodeBlockchainToJSON(bc)
-	// bc2 := NewBlockChain()
-	// bc2.DecodeBlockchainFromJSON(JSONBc)
-	// JSONBc2 := EncodeToBlockchainJSON(bc2)
-	// // printStringSlice(JSONBc2)
-	// fmt.Println(JSONBc2)
-	// fmt.Println("Length of the block chain is : ", bc2.Length)
 }
