@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,18 +28,21 @@ func (bc *BlockChain) StartTryingNonces() {
 		run := true
 		for run {
 			run = false
-			if bc.Length == b.Header.Height {
+			if bc.Length+1 == b.Header.Height {
 				puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
 				if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
 					nonce = generateNonce(nonce)
 					run = true
-					fmt.Println("Nonce not found")
+					// fmt.Println("Nonce not found")
 				} else {
+					//mutex.Lock()
 					b.Header.Nonce = nonce
 					fmt.Println("block generation:About to insert after nonce is found")
 					Bc.Insert(b)
+					SendHeartBeat(string(b.EncodeToJSON()))
 					// delete this line when running
-					stop = true
+					//stop = true
+					//mutex.Unlock()
 				}
 			}
 
@@ -58,13 +62,49 @@ func SendHeartBeat(blockJSON string) {
 	HBData := NewHeartBeatData(SELFID, SELFADDRESS, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()
 	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("Sending message to peer", string(id[0]+id[1]))
-		resp, err := http.Post(string(id[0]+id[1]), "application/json", bytes.NewBuffer(HBDataJSON))
+		fmt.Println("Sending message to peer", string(id))
+		resp, err := http.Post(string(id), "application/json", bytes.NewBuffer(HBDataJSON))
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Println(resp)
+		fmt.Println(resp.Status)
 	}
+}
+
+func askForParent(parentHash string, height string) bool {
+	intheight, err := strconv.ParseInt((height), 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if intheight < 0 {
+		return false
+	}
+	for _, id := range PEERLIST.peerIDs {
+		fmt.Println("sending get reques", string(id))
+		resp, err := http.Get(string(id) + "/block/" + height + "/" + parentHash)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if resp.StatusCode != http.StatusNotFound {
+			b := DecodeFromJSON(string(body))
+			result := Bc.GetBlock(b.Header.Height, b.Header.Hash)
+			if result != nil {
+				Bc.Insert(*b)
+				return true
+			}
+			strheight := strconv.Itoa(int(b.Header.Height))
+			if askForParent(b.Header.ParentHash, strheight) {
+				Bc.Insert(*b)
+			}
+		}
+
+	}
+	return false
 }
 
 // takes int string, converts to int, adds 1 and converts back to int string

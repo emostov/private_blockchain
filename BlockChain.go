@@ -61,7 +61,7 @@ func (bc *BlockChain) Insert(b Block) {
 		bc.Length = b.Header.Height
 	}
 	//mutex.Unlock()
-	fmt.Println("Insert Success")
+	// fmt.Println("Insert Success")
 }
 
 //EncodeToJSON encodes all blocks in chain and puts them into a slice

@@ -28,6 +28,15 @@ type PeerList struct {
 
 var genesis = makeGenesisBlock()
 
+func (pl *PeerList) contains(otherID string) bool {
+	for _, a := range pl.peerIDs {
+		if a == otherID {
+			return true
+		}
+	}
+	return false
+}
+
 // NewHeartBeatData creates instance of heart beat
 func NewHeartBeatData(id []string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}

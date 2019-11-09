@@ -7,12 +7,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/mux"
 )
 
 // Bc ...
 var Bc = NewBlockChain()
+
+var mutex = &sync.Mutex{}
 
 // Upload ...
 func Upload(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +28,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	h := vars["height"]
 	hash := vars["hash"]
-	height, err := strconv.Atoi(h)
+	height, err := strconv.ParseInt(h, 10, 64)
 
 	if err == nil {
 		block := Bc.GetBlock(int32(height), hash)
@@ -38,9 +41,10 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 			// check if parent exists
 			// if it doesnt ask for it?
 		}
-	} else {
-		w.WriteHeader(http.StatusNotFound)
 	}
+	// else {
+	// 	w.WriteHeader(http.StatusNotFound)
+	// }
 
 	w.Write([]byte("height :" + h + ", hash: " + hash))
 }
@@ -65,6 +69,10 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
 		block := DecodeFromJSON(string(data.BlockJSON))
+		// verify if block exists
+
+		// if block does not exist
+
 		if verifyNonce(block) {
 			Bc.Insert(*block)
 		}
@@ -91,18 +99,3 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(Bc.Show()))
 }
-
-// HeartBeatReceive()
-//  When a node receives a new block in HeartBeat, the node will first check if
-//  the parent block of this new block exists in its own blockchain (the previous
-// 	block is the block whose hash is the parentHash of the next block).
-// If the previous block doesn't exist, the node will ask any peer in PeerList at
-// "/block/{height}/{hash}" to download that block.
-// After making sure the previous block exists, insert the block from HeartBeatData
-//  to the current BlockChain.
-//  Alter this function so that when it receives a HeartBeatData with a new block,
-//  it verifies the nonce as described above.
-
-// func HeartBeatRecieve() (w http.ResponseWriter, r *http.Request) {
-
-// }

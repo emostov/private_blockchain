@@ -9,7 +9,7 @@ import (
 
 // Bc is the blochain instance
 
-// other port to use 8080 switch self id and peer id 8080
+// other port to use 8080 switch self id and peer id 8080 6689
 
 var peerID = []string{"http://localhost:6689"}
 
@@ -88,25 +88,3 @@ func test3() {
 	// fmt.Println(JSONBc2)
 	// fmt.Println("Length of the block chain is : ", bc2.Length)
 }
-
-// func test1() {
-// 	// test making a genesis block and encoding of a single block
-// 	bZero := makeGenesisBlock()
-// 	// printBlock(bZero)
-// 	encoded := bZero.EncodeToJSON()
-// 	//fmt.Println(encoded)
-// 	bZero2 := DecodeFromJSON(encoded)
-// 	printBlock(bZero2)
-// 	fmt.Println(bZero2.EncodeToJSON())
-// }
-
-// func test1() {
-// 	// test making a genesis block and encoding of a single block
-// 	bZero := makeGenesisBlock()
-// 	// printBlock(bZero)
-// 	encoded := bZero.EncodeToJSON()
-// 	//fmt.Println(encoded)
-// 	bZero2 := DecodeFromJSON(encoded)
-// 	printBlock(bZero2)
-// 	fmt.Println(bZero2.EncodeToJSON())
-// }
