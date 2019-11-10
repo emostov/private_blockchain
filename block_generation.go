@@ -34,14 +34,12 @@ func (bc *BlockChain) StartTryingNonces() {
 					run = true
 
 				} else {
-					mutex.Lock()
 					b.Header.Nonce = nonce
 					fmt.Println("block generation:About to insert and nonce is found")
 					Bc.Insert(b)
 					SendHeartBeat(string(b.EncodeToJSON()))
-					// delete this line when running
-					//stop = true
-					mutex.Unlock()
+
+					//stop = true // delete this line when running
 				}
 			}
 
@@ -49,8 +47,6 @@ func (bc *BlockChain) StartTryingNonces() {
 		//stop = true
 	}
 }
-
-//Helper function for Start Trying Nonces
 
 // SendHeartBeat ...
 func SendHeartBeat(blockJSON string) {
@@ -92,7 +88,7 @@ func askForParent(parentHash string, height string) bool {
 		fmt.Println("About to check if need another parent #askForParent")
 		if resp.StatusCode != http.StatusNotFound {
 			b := DecodeFromJSON(string(body))
-			fmt.Println("block string is ", string(body))
+			//fmt.Println("block string is ", string(body))
 			fmt.Println("block json is", string(b.EncodeToJSON()))
 
 			result := Bc.GetBlock(b.Header.Height, b.Header.Hash)
@@ -105,6 +101,7 @@ func askForParent(parentHash string, height string) bool {
 			strheight := strconv.Itoa(int(b.Header.Height - 1))
 			if askForParent(b.Header.ParentHash, strheight) {
 				Bc.Insert(*b)
+				return true
 			}
 		}
 

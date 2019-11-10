@@ -46,7 +46,6 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 
-		mutex.Lock()
 		fmt.Println("Im an id and am getting a post", SELFID[1])
 		//run = false
 		s := string(requestBody)
@@ -58,6 +57,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// if block does not exist
 
 		if verifyNonce(block) {
+			fmt.Println("got post HBrec and nonce verified", SELFID[1])
 			result := Bc.GetBlock(block.Header.Height, block.Header.Hash)
 			resultParent := Bc.GetBlock(block.Header.Height-1, block.Header.ParentHash)
 			// verify if block exists already
@@ -73,8 +73,9 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Println("HB Recieve: Block and parent block already exist so no insert")
 			}
+		} else {
+			fmt.Println("got post HBrec and nonce NOT verified", SELFID[1])
 		}
-		mutex.Unlock()
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -101,4 +102,5 @@ func Start(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("I am at port " + SELFID[1] + ", and I just got asked to start mining")
 	go Bc.StartTryingNonces()
+	w.Write([]byte("Mining Engaged for " + SELFID[1]))
 }
