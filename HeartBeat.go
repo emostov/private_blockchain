@@ -8,10 +8,10 @@ import (
 
 // HeartBeatData stores bc and node information to send
 type HeartBeatData struct {
-	ID          []string // sender's id
-	Address     string   // sender's address
-	BlockJSON   string
-	PeerMapJSON string
+	ID          []string `json:"id"`      // sender's id
+	Address     string   `json:"address"` // sender's address
+	BlockJSON   string   `json:"blockjson"`
+	PeerMapJSON string   `json:"peermapjson"`
 }
 
 // PeerList ...
@@ -20,11 +20,6 @@ type PeerList struct {
 	peerIDs []string
 	length  int32
 }
-
-// type selfID struct {
-// 	ipaddress string
-// 	port      string
-// }
 
 func (pl *PeerList) contains(otherID string) bool {
 	for _, a := range pl.peerIDs {

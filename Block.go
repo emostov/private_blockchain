@@ -33,13 +33,13 @@ func makeSha256Digest(m string) string {
 //JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
-	Nonce      string
-	Height     int32
-	Timestamp  int64 // Unix Timestamp
-	ParentHash string
-	Size       int32
-	Hash       string
-	Value      string
+	Nonce      string `json:"nonce"`
+	Height     int32  `json:"height"`
+	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
+	ParentHash string `json:"parenthash"`
+	Size       int32  `json:"size"`
+	Hash       string `json:"hash"`
+	Value      string `json:"value"`
 }
 
 //Header Struct describing the fields of the header
@@ -67,8 +67,6 @@ func NewHeader(Height int32, pHash string) *Header {
 	time := int64(time.Now().Unix())
 	return &Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32)}
 }
-
-//Block Methods
 
 // Initialize an instance of a block
 func (b *Block) Initialize(Height int32, ParentHash string, value string) {
@@ -118,10 +116,3 @@ func DecodeFromJSON(m string) *Block {
 	b := &Block{Header: h, Value: shape.Value}
 	return b
 }
-
-// SetNonce recomputes hash and sets nonce for block
-// func (b *Block) SetNonce(nonce string) {
-// 	b.Header.Nonce = nonce
-// 	HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
-// 	digest := makeSha256Digest(HashStr)
-// }

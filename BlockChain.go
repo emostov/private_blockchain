@@ -7,8 +7,8 @@ import (
 
 // BlockChain struct is used to describe the structure of the blockchain
 type BlockChain struct {
-	Chain  map[int32][]Block
-	Length int32 // length starts at 0
+	Chain  map[int32][]Block `json:"chain"`
+	Length int32             `json:"length"` // length starts at 0
 }
 
 //NewBlockChain creates a new blockchain instance, initializing map
@@ -61,7 +61,7 @@ func (bc *BlockChain) Insert(b Block) {
 		bc.Length = b.Header.Height
 	}
 	mutex.Unlock()
-	fmt.Println("post bc.insert Show()")
+	fmt.Println("LOG: post bc.insert Show() below ")
 	fmt.Println(Bc.Show())
 
 }
