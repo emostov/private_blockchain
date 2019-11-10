@@ -16,15 +16,17 @@ var mutex = &sync.Mutex{}
 var PEERLIST = PeerList{selfID: SELFID, peerIDs: peerID, length: Bc.Length}
 
 // port options 8080 6689
-// var target = "0000000" // seven 0 ... long time!
-var target = "000000" // six 0 does first 3 fast, 4th medium, then long time
+var target = "0000000" // seven 0 ... long time!
+// var target = "000000" // six 0 does first 3 fast, 4th medium, then long time
 
 // SELFID ...
-// var SELFID = []string{"http://localhost:", "6689"}
-var SELFID = []string{"http://localhost:", "8080"}
+var SELFID = []string{"http://localhost:", "6689"}
 
-// var peerID = []string{"http://localhost:8080"}
-var peerID = []string{"http://localhost:6689"}
+// var SELFID = []string{"http://localhost:", "8080"}
+
+var peerID = []string{"http://localhost:8080"}
+
+// var peerID = []string{"http://localhost:6689"}
 
 // SELFADDRESS ...
 var SELFADDRESS = "http://localhost:" + SELFID[1]
