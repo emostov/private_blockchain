@@ -111,7 +111,7 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 func Start(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("I am at port " + SELFID[1] + ", and I just got asked to start mining")
-	//DownloadChain()
+	DownloadChain()
 	go Bc.StartTryingNonces()
 	w.Write([]byte("Mining Engaged for " + SELFID[1]))
 }

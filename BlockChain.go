@@ -51,6 +51,7 @@ func (bc *BlockChain) Insert(b Block) {
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
+				fmt.Println("Log: In Insert and block was not inserted because duplicate")
 				return
 			}
 		}
@@ -111,23 +112,37 @@ func EncodeBlockchainToJSON(bc *BlockChain) string {
 // 	}
 // }
 
+// type JsonType struct {
+// 	Array []string
+// }
+
 //DecodeBlockchainFromJSON ...
 func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	//takes a blockchain instance and a list of json blocks and inserts each block
 	// into the blochchain instance
-	var blockList []Block
+	var blockList []JSONShape
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
-	fmt.Println("in decode from bc and the JSONblock list is ", JSONBlocks)
-	for _, block := range blockList {
-		// fmt.Println("hash: " + block.Header.Hash + ", height" + string(block.Header.Height))
-		fmt.Println(block.Header)
-	}
+	// fmt.Println("in decode from bc and the JSONblock list is ", JSONBlocks)
+	// fmt.Println("block list is ", blockList)
+	// for _, block := range blockList {
+	// 	fmt.Println("block string ", block)
+	// 	// fmt.Println(block.Header)
+	// }
 	if err == nil {
-		for _, JSONB := range blockList {
-			// block := DecodeFromJSON(JSONB)
-			// bc.Insert(*block)
-			bc.Insert(JSONB)
+		for _, shape := range blockList {
+			// create block from json
+			h := Header{
+				Nonce:      shape.Nonce,
+				Height:     shape.Height,
+				Timestamp:  shape.Timestamp,
+				ParentHash: shape.ParentHash,
+				Size:       shape.Size,
+				Hash:       shape.Hash,
+			}
+			b := Block{Header: h, Value: shape.Value}
+			bc.Insert(b)
 		}
+		fmt.Println("no error")
 
 	} else {
 		log.Fatalln(err)

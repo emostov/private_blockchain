@@ -13,31 +13,32 @@ var Bc = NewBlockChain()
 var mutex = &sync.Mutex{}
 
 // PEERLIST right now is just hard coded
-var PEERLIST = PeerList{selfID: SELFID, peerIDs: peerID, length: Bc.Length}
+var PEERLIST = PeerList{selfID: SELFID, peerIDs: PEERID, length: Bc.Length}
 
 // port options 8080 6689
 
-// var SELFID = []string{"http://localhost:", "8080"}
-// var peerID = []string{"http://localhost:6689"}
-// var target = "000000" // six 0 fairly quick
+var SELFID = []string{"http://localhost:", "8080"}
+var PEERID = []string{"http://localhost:6689"}
 
-var SELFID = []string{"http://localhost:", "6689"}
-var peerID = []string{"http://localhost:8080"}
+//var target = "000000" // six 0 fairly quick
+
+// var SELFID = []string{"http://localhost:", "6689"}
+// var PEERID = []string{"http://localhost:8080"}
 var target = "0000000" // seven 0 ... long time
 
 // SELFADDRESS ...
 var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	//minerSetup()
-	testDecode()
+	minerSetup()
+	//testDecode()
 	//test1()
+	//test3()
 }
 func minerSetup() {
-	//testSetupBlockInsert()
-	//go Bc.StartTryingNonces()
-	genesis := makeGenesisBlock()
-	Bc.Insert(genesis)
+
+	// genesis := makeGenesisBlock()
+	// Bc.Insert(genesis)
 	// fmt.Println(Bc.Show())
 	//testAsk()
 	fmt.Println("I am at port ", SELFID[1])
@@ -62,7 +63,7 @@ func testDecode() {
 	// genesis := makeGenesisBlock()
 	// bc.Insert(genesis)
 	bc.Insert(blocks[0])
-	//bc.Insert(blocks[1])
+	bc.Insert(blocks[1])
 	//bc.Insert(blocks[2])
 	fmt.Println("bc ", bc.Show())
 	blocks1 := EncodeBlockchainToJSON(bc)
@@ -102,9 +103,9 @@ func test1() {
 	coded := b.EncodeToJSON()
 	fmt.Println(" 1 coded block is ", string(coded))
 	decoded := DecodeFromJSON(string(coded))
-	fmt.Println(decoded)
+	fmt.Println("decoded block is ", decoded)
 	coded2 := decoded.EncodeToJSON()
-	fmt.Println(string(coded2))
+	fmt.Println("coded 2 ", string(coded2))
 
 }
 
