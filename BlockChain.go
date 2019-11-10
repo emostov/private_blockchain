@@ -51,6 +51,7 @@ func (bc *BlockChain) Insert(b Block) {
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
+				fmt.Println("Log: In Insert and block was not inserted because duplicate")
 				return
 			}
 		}
@@ -123,10 +124,10 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
 	// fmt.Println("in decode from bc and the JSONblock list is ", JSONBlocks)
 	// fmt.Println("block list is ", blockList)
-	for _, block := range blockList {
-		fmt.Println("block string ", block)
-		// fmt.Println(block.Header)
-	}
+	// for _, block := range blockList {
+	// 	fmt.Println("block string ", block)
+	// 	// fmt.Println(block.Header)
+	// }
 	if err == nil {
 		for _, shape := range blockList {
 			// create block from json

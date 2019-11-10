@@ -113,10 +113,10 @@ func askForParent(parentHash string, height string) bool {
 // DownloadChain goes to a node in peer list and asks for entire block
 func DownloadChain() {
 	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("LOG: #download Sending message to peer", string(id))
+		fmt.Println("LOG: #download asking peer ", string(id), " for chain")
 		resp, err := http.Get(string(id) + "/Upload")
 		if err != nil {
-			fmt.Println("asked for blockchain and there was an the err, ", err)
+			log.Fatal(err)
 		}
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
@@ -125,9 +125,6 @@ func DownloadChain() {
 		}
 		fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
 		if resp.StatusCode == http.StatusOK {
-			fmt.Println("LOG: download chain status: ", resp.Status)
-			fmt.Println("Copying block chain ")
-			fmt.Println("the block chain string(body) is ", string(body))
 			Bc.DecodeBlockchainFromJSON(string(body))
 		}
 
