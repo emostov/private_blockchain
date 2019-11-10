@@ -60,9 +60,9 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 
-		//mutex.Lock()
-		w.Write([]byte("In HeartBeat Recieve  "))
-		fmt.Println("IM an id and am getting a post", SELFID[1])
+		mutex.Lock()
+		//w.Write([]byte("In HeartBeat Recieve  "))
+		fmt.Println("Im an id and am getting a post", SELFID[1])
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
@@ -74,11 +74,22 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// if block does not exist
 
 		if verifyNonce(block) {
-			Bc.Insert(*block)
+			result := Bc.GetBlock(block.Header.Height, block.Header.Hash)
+			if result != nil {
+				fmt.Println("in HBRecieve, insert succeses: ", block.Header.Hash)
+				Bc.Insert(*block)
+			} else {
+				fmt.Println("in HBRecieve, need to ask for parent: ", block.Header.Hash)
+				strheight := strconv.Itoa(int(block.Header.Height - 1))
+				if askForParent(block.Header.ParentHash, strheight) {
+					Bc.Insert(*block)
+				}
+			}
 		}
-		//mutex.Unlock()
+		mutex.Unlock()
+	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
 
 }
 

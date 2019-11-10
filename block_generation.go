@@ -35,14 +35,14 @@ func (bc *BlockChain) StartTryingNonces() {
 					run = true
 					// fmt.Println("Nonce not found")
 				} else {
-					//mutex.Lock()
+					mutex.Lock()
 					b.Header.Nonce = nonce
-					fmt.Println("block generation:About to insert after nonce is found")
+					fmt.Println("block generation:About to insert and nonce is found")
 					Bc.Insert(b)
-					//SendHeartBeat(string(b.EncodeToJSON()))
+					SendHeartBeat(string(b.EncodeToJSON()))
 					// delete this line when running
 					//stop = true
-					//mutex.Unlock()
+					mutex.Unlock()
 				}
 			}
 
@@ -63,11 +63,11 @@ func SendHeartBeat(blockJSON string) {
 	HBDataJSON, _ := HBData.HBDataToJSON()
 	for _, id := range PEERLIST.peerIDs {
 		fmt.Println("Sending message to peer", string(id))
-		resp, err := http.Post(string(id), "application/json", bytes.NewBuffer(HBDataJSON))
+		resp, err := http.Post(string(id)+"/heartbeat/recieve", "application/json", bytes.NewBuffer(HBDataJSON))
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Println(resp.Status)
+		fmt.Println("send heart beat status", resp.Status)
 	}
 }
 
@@ -90,7 +90,7 @@ func askForParent(parentHash string, height string) bool {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("11asking for another parent block")
+		fmt.Println("About to check if need another parent #askForParent")
 		if resp.StatusCode != http.StatusNotFound {
 			b := DecodeFromJSON(string(body))
 			fmt.Println("block string is ", string(body))

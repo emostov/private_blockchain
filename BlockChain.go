@@ -45,7 +45,7 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
-	//mutex.Lock()
+
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -60,8 +60,9 @@ func (bc *BlockChain) Insert(b Block) {
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
-	//mutex.Unlock()
-	// fmt.Println("Insert Success")
+	fmt.Println("post bc.insert Show()")
+	fmt.Println(Bc.Show())
+
 }
 
 //EncodeToJSON encodes all blocks in chain and puts them into a slice
@@ -152,14 +153,6 @@ func makeGenesisBlock() Block {
 }
 
 // Testing utils and functions
-func printBlock(b *Block) {
-	// prints blocks fields for debugging and testing purposes only
-	h := "Height: " + string(b.Header.Height) + ", Timestamp: " + string(b.Header.Timestamp) + ", parent Hash: " + b.Header.ParentHash + ", Size" + string(b.Header.Size)
-	value := "Block Value: " + b.Value
-	fmt.Println(value)
-	fmt.Println(h)
-	fmt.Println("___Block End___")
-}
 
 func printStringSlice(slice []string) {
 	// takes slice of json blocks and prints each one
@@ -170,9 +163,8 @@ func printStringSlice(slice []string) {
 }
 
 func makeTenBlocks() []Block {
-	// creates an array of  blocks of the same
+	// creates an array of  blocks of the same height
 	// starts with a genesis block as the only block at Height zero
-	Heights := [9]int32{1, 1, 2, 2, 3, 3, 4, 4, 5}
 	bZero := makeGenesisBlock()
 	var blocks []Block
 	blocks = append(blocks, bZero)
@@ -180,7 +172,7 @@ func makeTenBlocks() []Block {
 		var b Block
 		// Height := int32((i % 4) + 1)
 		// naive parent Hash, not actually accurate to chain
-		b.Initialize(Heights[1], bZero.Header.Hash, "test block value")
+		b.Initialize(int32(1), bZero.Header.Hash, "test block value")
 		blocks = append(blocks, b)
 	}
 	return blocks

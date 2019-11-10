@@ -29,12 +29,10 @@ func miner1() {
 
 	testSetupBlockInsert()
 
-	//router := NewRouter()
-	// go Bc.StartTryingNonces()
-	Bc.StartTryingNonces()
+	go Bc.StartTryingNonces()
 
 	fmt.Println(Bc.Show())
-	testAsk()
+	//testAsk()
 	fmt.Println("I am at port ", SELFID[1])
 	router := NewRouter()
 	if len(os.Args) > 1 {
