@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 // BlockChain struct is used to describe the structure of the blockchain
@@ -62,7 +63,7 @@ func (bc *BlockChain) Insert(b Block) {
 	}
 	mutex.Unlock()
 	fmt.Println("LOG: post bc.insert Show() below ")
-	fmt.Println(Bc.Show())
+	fmt.Println(bc.Show())
 
 }
 
@@ -114,8 +115,13 @@ func EncodeBlockchainToJSON(bc *BlockChain) string {
 func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	//takes a blockchain instance and a list of json blocks and inserts each block
 	// into the blochchain instance
-	blockList := []Block{}
+	var blockList []Block
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
+	fmt.Println("in decode from bc and the JSONblock list is ", JSONBlocks)
+	for _, block := range blockList {
+		// fmt.Println("hash: " + block.Header.Hash + ", height" + string(block.Header.Height))
+		fmt.Println(block.Header)
+	}
 	if err == nil {
 		for _, JSONB := range blockList {
 			// block := DecodeFromJSON(JSONB)
@@ -123,6 +129,8 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 			bc.Insert(JSONB)
 		}
 
+	} else {
+		log.Fatalln(err)
 	}
 
 }

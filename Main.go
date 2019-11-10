@@ -29,7 +29,9 @@ var target = "0000000" // seven 0 ... long time
 var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	minerSetup()
+	//minerSetup()
+	testDecode()
+	//test1()
 }
 func minerSetup() {
 	//testSetupBlockInsert()
@@ -52,6 +54,20 @@ func testSetupBlockInsert() {
 	Bc.Insert(blocks[0])
 	Bc.Insert(blocks[1])
 	Bc.Insert(blocks[2])
+}
+
+func testDecode() {
+	bc := NewBlockChain()
+	var blocks = makeTenBlocks()
+	// genesis := makeGenesisBlock()
+	// bc.Insert(genesis)
+	bc.Insert(blocks[0])
+	//bc.Insert(blocks[1])
+	//bc.Insert(blocks[2])
+	fmt.Println("bc ", bc.Show())
+	blocks1 := EncodeBlockchainToJSON(bc)
+	Bc.DecodeBlockchainFromJSON(blocks1)
+	fmt.Println("Bc ", Bc.Show())
 }
 
 func test4() {
@@ -79,11 +95,23 @@ func testAsk() {
 // 	printStringSlice(JSONBc)
 // }
 
+func test1() {
+	// block encoding and decoding test
+	var b Block
+	b.Initialize(int32(0), "parent hash", "merkle value")
+	coded := b.EncodeToJSON()
+	fmt.Println(" 1 coded block is ", string(coded))
+	decoded := DecodeFromJSON(string(coded))
+	fmt.Println(decoded)
+	coded2 := decoded.EncodeToJSON()
+	fmt.Println(string(coded2))
+
+}
+
 func test3() {
 	// testing creating a blockchain, and block chain encoding and decoding
 	bc := NewBlockChain()
 	blocks := makeTenBlocks()
-	bc.Show()
 	for _, b := range blocks {
 		bc.Insert(b)
 	}

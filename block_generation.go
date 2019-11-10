@@ -127,6 +127,7 @@ func DownloadChain() {
 		if resp.StatusCode == http.StatusOK {
 			fmt.Println("LOG: download chain status: ", resp.Status)
 			fmt.Println("Copying block chain ")
+			fmt.Println("the block chain string(body) is ", string(body))
 			Bc.DecodeBlockchainFromJSON(string(body))
 		}
 

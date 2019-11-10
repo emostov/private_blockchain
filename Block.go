@@ -44,12 +44,12 @@ type JSONShape struct {
 
 //Header Struct describing the fields of the header
 type Header struct {
-	Nonce      string
-	Height     int32
-	Timestamp  int64 // Unix Timestamp
-	ParentHash string
-	Size       int32
-	Hash       string // HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
+	Nonce      string `json:"nonce"`
+	Height     int32  `json:"height"`
+	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
+	ParentHash string `json:"parenthash"`
+	Size       int32  `json:"size"`
+	Hash       string `json:"hash"` // HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
 }
 
 //Block struct with header pointer and value
