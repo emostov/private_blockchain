@@ -15,7 +15,7 @@ func (bc *BlockChain) StartTryingNonces() {
 
 	for !stop {
 		parentBlock := bc.GetLatestBlock()[0]
-		fmt.Println("Just created parent block ")
+		//fmt.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
 		b.Initialize(bc.Length+1, parentHash, "test block value")
@@ -27,11 +27,12 @@ func (bc *BlockChain) StartTryingNonces() {
 		for run {
 			run = false
 			if bc.Length+1 == b.Header.Height {
+
 				puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
 				if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
 					nonce = generateNonce(nonce)
 					run = true
-					// fmt.Println("Nonce not found")
+
 				} else {
 					mutex.Lock()
 					b.Header.Nonce = nonce
@@ -45,7 +46,7 @@ func (bc *BlockChain) StartTryingNonces() {
 			}
 
 		}
-		stop = true
+		//stop = true
 	}
 }
 

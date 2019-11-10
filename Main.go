@@ -13,7 +13,9 @@ import (
 // port options 8080 6689
 
 var peerID = []string{"http://localhost:6689"}
-var target = "00"
+
+// var target = "0000000" // seven 0 ... long time!
+var target = "000000" // six 0 does first 3 fast, 4th medium, then long time
 
 // Bc ...
 var Bc = NewBlockChain()
