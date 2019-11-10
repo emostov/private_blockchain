@@ -26,8 +26,6 @@ type PeerList struct {
 // 	port      string
 // }
 
-var genesis = makeGenesisBlock()
-
 func (pl *PeerList) contains(otherID string) bool {
 	for _, a := range pl.peerIDs {
 		if a == otherID {

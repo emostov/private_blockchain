@@ -5,13 +5,20 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 )
 
 // Bc is the blochain instance
 
-// other port to use 8080 switch self id and peer id 8080 6689
+// port options 8080 6689
 
 var peerID = []string{"http://localhost:6689"}
+var target = "00"
+
+// Bc ...
+var Bc = NewBlockChain()
+
+var mutex = &sync.Mutex{}
 
 // PEERLIST right now is just hard coded
 var PEERLIST = PeerList{selfID: SELFID, peerIDs: peerID, length: Bc.Length}
@@ -23,15 +30,14 @@ var SELFID = []string{"http://localhost:", "8080"}
 var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	miner1()
+	minerSetup()
 }
-func miner1() {
-
-	testSetupBlockInsert()
-
-	go Bc.StartTryingNonces()
-
-	fmt.Println(Bc.Show())
+func minerSetup() {
+	//testSetupBlockInsert()
+	//go Bc.StartTryingNonces()
+	genesis := makeGenesisBlock()
+	Bc.Insert(genesis)
+	// fmt.Println(Bc.Show())
 	//testAsk()
 	fmt.Println("I am at port ", SELFID[1])
 	router := NewRouter()

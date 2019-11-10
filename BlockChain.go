@@ -8,7 +8,7 @@ import (
 // BlockChain struct is used to describe the structure of the blockchain
 type BlockChain struct {
 	Chain  map[int32][]Block
-	Length int32 // length starts at 1
+	Length int32 // length starts at 0
 }
 
 //NewBlockChain creates a new blockchain instance, initializing map
@@ -128,7 +128,6 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 
 // GetLatestBlock returns the list of blocks of height "BlockChain.length"
 func (bc *BlockChain) GetLatestBlock() []Block {
-
 	return bc.Chain[bc.Length]
 }
 
@@ -143,6 +142,7 @@ func (bc *BlockChain) GetParentBlock(b *Block) *Block {
 	return nil
 }
 
+// makeGenesisBlock makes a dummy block
 func makeGenesisBlock() Block {
 	//creates and returns a genesis block
 	pHash := makeSha256Digest("Hash this")
@@ -170,8 +170,6 @@ func makeTenBlocks() []Block {
 	blocks = append(blocks, bZero)
 	for i := 1; i < 10; i++ {
 		var b Block
-		// Height := int32((i % 4) + 1)
-		// naive parent Hash, not actually accurate to chain
 		b.Initialize(int32(1), bZero.Header.Hash, "test block value")
 		blocks = append(blocks, b)
 	}

@@ -57,4 +57,10 @@ var routes = Routes{
 		"/heartbeat/recieve",
 		HeartBeatRecieve,
 	},
+	Route{
+		"Start",
+		"get",
+		"/start",
+		Start,
+	},
 }

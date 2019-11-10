@@ -9,8 +9,6 @@ import (
 	"strconv"
 )
 
-var target = "00"
-
 // StartTryingNonces ...
 func (bc *BlockChain) StartTryingNonces() {
 	stop := false
