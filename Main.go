@@ -32,6 +32,7 @@ func main() {
 	//minerSetup()
 	testDecode()
 	//test1()
+	//test3()
 }
 func minerSetup() {
 	//testSetupBlockInsert()
@@ -62,7 +63,7 @@ func testDecode() {
 	// genesis := makeGenesisBlock()
 	// bc.Insert(genesis)
 	bc.Insert(blocks[0])
-	//bc.Insert(blocks[1])
+	bc.Insert(blocks[1])
 	//bc.Insert(blocks[2])
 	fmt.Println("bc ", bc.Show())
 	blocks1 := EncodeBlockchainToJSON(bc)
@@ -102,9 +103,9 @@ func test1() {
 	coded := b.EncodeToJSON()
 	fmt.Println(" 1 coded block is ", string(coded))
 	decoded := DecodeFromJSON(string(coded))
-	fmt.Println(decoded)
+	fmt.Println("decoded block is ", decoded)
 	coded2 := decoded.EncodeToJSON()
-	fmt.Println(string(coded2))
+	fmt.Println("coded 2 ", string(coded2))
 
 }
 

@@ -54,18 +54,18 @@ type Header struct {
 
 //Block struct with header pointer and value
 type Block struct {
-	Header *Header
+	Header Header
 	Value  string // root Hash of merkle tree
 }
 
 //Header tools
 
 // NewHeader is used to create and initialize a heder
-func NewHeader(Height int32, pHash string) *Header {
+func NewHeader(Height int32, pHash string) Header {
 	// returns a header after given Height and parent Hash
 	// called by the block initialization method
 	time := int64(time.Now().Unix())
-	return &Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32)}
+	return Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32)}
 }
 
 // Initialize an instance of a block
@@ -105,7 +105,7 @@ func DecodeFromJSON(m string) *Block {
 	// takes in a string of a json encoded block and returns a block pointer
 	var shape JSONShape
 	json.Unmarshal([]byte(m), &shape)
-	h := &Header{
+	h := Header{
 		Nonce:      shape.Nonce,
 		Height:     shape.Height,
 		Timestamp:  shape.Timestamp,
