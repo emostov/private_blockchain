@@ -14,7 +14,7 @@ import (
 // Upload sends the entire json block chain
 func Upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		fmt.Println("Log: succesful ask for block chain" + SELFID[1])
+		fmt.Println("Log: succesful ask for block chain" + MINERID.Port)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(EncodeBlockchainToJSON(Bc)))
 	} else {
@@ -30,7 +30,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 		h := vars["height"]
 		hash := vars["hash"]
 		height, err := strconv.ParseInt(h, 10, 64)
-		fmt.Println("LOG: i am ", SELFID, " ask get", "height :"+h+", hash: "+hash)
+		fmt.Println("LOG: i am ", MINERID.Port, " ask get", "height :"+h+", hash: "+hash)
 		if err == nil {
 			block := Bc.GetBlock(int32(height), hash)
 			if block == nil {
@@ -56,7 +56,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 
-		fmt.Println("LOG: Im getting a post request #HBrec", SELFID[1])
+		fmt.Println("LOG: Im getting a post request #HBrec", MINERID.Port)
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
@@ -67,7 +67,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// if block does not exist
 
 		if verifyNonce(block) {
-			fmt.Println("LOG: got post HBrec and nonce verified", SELFID[1])
+			fmt.Println("LOG: got post HBrec and nonce verified", MINERID.Port)
 			result := Bc.GetBlock(block.Header.Height, block.Header.Hash)
 			resultParent := Bc.GetBlock(block.Header.Height-1, block.Header.ParentHash)
 			// verify if block exists already
@@ -84,7 +84,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("LOG: HB Recieve: Block and parent block already exist so no insert")
 			}
 		} else {
-			fmt.Println("LOG: got post HBrec and nonce NOT verified", SELFID[1])
+			fmt.Println("LOG: got post HBrec and nonce NOT verified", MINERID.Port)
 		}
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -110,10 +110,10 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 //Start simply starts a thread for mining. Make sure to only call once!
 func Start(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Println("I am at port " + SELFID[1] + ", and I just got asked to start mining")
+	fmt.Println("I am at port " + MINERID.Port + ", and I just got asked to start mining")
 	DownloadChain()
 	go Bc.StartTryingNonces()
-	w.Write([]byte("Mining Engaged for " + SELFID[1]))
+	w.Write([]byte("Mining Engaged for " + MINERID.Port))
 }
 
 //Register returns registration information to node and updates SRD.PeerMap with new ID
@@ -128,7 +128,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 		regData := RegisterData{AssignedID: requestBody, PeerMapJSON: SRD.PeerMapJSON}
 		w.Write(regData.EncodeRegisterDataToJSON())
-		SRD.PeerMap = append(SRD.PeerMap, requestBody) //assume request body is id and address struct in string
+		decodedID := DecodeIDFromJSON(requestBody)
+		SRD.PeerMap = append(SRD.PeerMap, decodedID) //assume request body is id and address struct in string
 		SRD.EncodePeerMapToJSON()
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)

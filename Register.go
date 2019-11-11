@@ -43,7 +43,7 @@ func (pl *PeerList) contains(otherID string) bool {
 func (srd *ServerRegisterData) EncodePeerMapToJSON() {
 	peermapjs := "["
 	for _, id := range srd.PeerMap {
-		peermapjs += (id + ",")
+		peermapjs += (id.EncodeIDToJSON() + ",")
 	}
 	peermapjs = peermapjs[:len(peermapjs)-1] + "]"
 	srd.PeerMapJSON = peermapjs
@@ -65,6 +65,15 @@ func (id *ID) EncodeIDToJSON() string {
 		log.Fatal(err)
 	}
 	return string(encodedID)
+}
+
+// DecodeIDFromJSON ...
+func DecodeIDFromJSON(idjs string) ID {
+	var id ID
+	if err := json.Unmarshal([]byte(idjs), &id); err != nil {
+		panic(err)
+	}
+	return id
 }
 
 // // RegisterMe
