@@ -8,37 +8,45 @@ import (
 	"sync"
 )
 
+var ServerPeerMap = []ID{MINERID, MINER2ID}
+var SID = ID{Address: "http://localhost:", Port: "6688"}
+
+//SRD is a server register data global for a server instance
+var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "", PeerMap: []string{}}
+
 // Bc ...
 var Bc = NewBlockChain()
 var mutex = &sync.Mutex{}
 
 // PEERLIST right now is just hard coded
-var PEERLIST = PeerList{selfID: SELFID, peerIDs: PEERID, length: Bc.Length}
+var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []string{}, Length: Bc.Length}
 
 // port options 8080 6689
 
-var SELFID = []string{"http://localhost:", "8080"}
-var PEERID = []string{"http://localhost:6689"}
+var MINERID = ID{Address: "http://localhost:", Port: "6060"}
+
+var MINER2ID = ID{Address: "http://localhost:", Port: "8080"}
 
 //var target = "000000" // six 0 fairly quick
 
 // var SELFID = []string{"http://localhost:", "6689"}
-// var PEERID = []string{"http://localhost:8080"}
+
+//var PEERID = []string{"http://localhost:8080"}
 var target = "0000000" // seven 0 ... long time
 
 // SELFADDRESS ...
 var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	minerSetup()
+	miner1Setup()
 	//testDecode()
 	//test1()
 	//test3()
 }
-func minerSetup() {
+func miner1Setup() {
 
-	// genesis := makeGenesisBlock()
-	// Bc.Insert(genesis)
+	genesis := makeGenesisBlock()
+	Bc.Insert(genesis)
 	// fmt.Println(Bc.Show())
 	//testAsk()
 	fmt.Println("I am at port ", SELFID[1])
@@ -47,6 +55,15 @@ func minerSetup() {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+SELFID[1], router))
+	}
+}
+
+func registationServerSetup() {
+	router := NewRouter()
+	if len(os.Args) > 1 {
+		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
+	} else {
+		log.Fatal(http.ListenAndServe(":"+SID.Port, router))
 	}
 }
 

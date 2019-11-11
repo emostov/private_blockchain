@@ -54,13 +54,13 @@ func SendHeartBeat(blockJSON string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	HBData := NewHeartBeatData(SELFID, SELFADDRESS, blockJSON, string(peerMapJSON))
+	HBData := NewHeartBeatData(MINERID.Port, MINERID.Address, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()
-	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("LOG: Sending message to peer", string(id))
-		resp, err := http.Post(string(id)+"/heartbeat/recieve", "application/json", bytes.NewBuffer(HBDataJSON))
+	for _, id := range PEERLIST.PeerIDs {
+		fmt.Println("LOG: Sending message to peer", string(id.Port))
+		resp, err := http.Post(id.Address+id.Port+"/heartbeat/recieve", "application/json", bytes.NewBuffer(HBDataJSON))
 		if err != nil {
-			log.Fatalln(err)
+			log.Print(err)
 		}
 		fmt.Println("LOG: send heart beat - status ", resp.Status)
 	}
@@ -74,9 +74,9 @@ func askForParent(parentHash string, height string) bool {
 	if intheight < 0 {
 		return false
 	}
-	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("LOG: sending get request in askForParent", string(id))
-		resp, err := http.Get(string(id) + "/block/" + height + "/" + parentHash)
+	for _, id := range PEERLIST.PeerIDs {
+		fmt.Println("LOG: sending get request in askForParent", string(id.Port))
+		resp, err := http.Get(id.Address + id.Port + "/block/" + height + "/" + parentHash)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -112,9 +112,9 @@ func askForParent(parentHash string, height string) bool {
 
 // DownloadChain goes to a node in peer list and asks for entire block
 func DownloadChain() {
-	for _, id := range PEERLIST.peerIDs {
-		fmt.Println("LOG: #download asking peer ", string(id), " for chain")
-		resp, err := http.Get(string(id) + "/Upload")
+	for _, id := range PEERLIST.PeerIDs {
+		fmt.Println("LOG: #download asking peer ", string(id.Port), " for chain")
+		resp, err := http.Get(id.Address + id.Port + "/Upload")
 		if err != nil {
 			log.Fatal(err)
 		}

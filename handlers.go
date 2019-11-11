@@ -115,3 +115,22 @@ func Start(w http.ResponseWriter, r *http.Request) {
 	go Bc.StartTryingNonces()
 	w.Write([]byte("Mining Engaged for " + SELFID[1]))
 }
+
+//Register returns registration information to node and updates SRD.PeerMap with new ID
+func Register(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		fmt.Println("This is the Register server and I just got a request to register")
+		requestBody, err := readRequestBody(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		w.WriteHeader(http.StatusOK)
+
+		regData := RegisterData{AssignedID: requestBody, PeerMapJSON: SRD.PeerMapJSON}
+		w.Write(regData.EncodeRegisterDataToJSON())
+		SRD.PeerMap = append(SRD.PeerMap, requestBody) //assume request body is id and address struct in string
+		SRD.EncodePeerMapToJSON()
+	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}

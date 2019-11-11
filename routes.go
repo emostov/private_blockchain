@@ -59,8 +59,14 @@ var routes = Routes{
 	},
 	Route{
 		"Start",
-		"get",
+		"GET",
 		"/start",
 		Start,
+	},
+	Route{
+		"peer",
+		"POST",
+		"/peer",
+		Register,
 	},
 }

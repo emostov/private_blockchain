@@ -8,30 +8,14 @@ import (
 
 // HeartBeatData stores bc and node information to send
 type HeartBeatData struct {
-	ID          []string `json:"id"`      // sender's id
-	Address     string   `json:"address"` // sender's address
-	BlockJSON   string   `json:"blockjson"`
-	PeerMapJSON string   `json:"peermapjson"`
-}
-
-// PeerList ...
-type PeerList struct {
-	selfID  []string
-	peerIDs []string
-	length  int32
-}
-
-func (pl *PeerList) contains(otherID string) bool {
-	for _, a := range pl.peerIDs {
-		if a == otherID {
-			return true
-		}
-	}
-	return false
+	ID          string `json:"id"`      // sender's id
+	Address     string `json:"address"` // sender's address
+	BlockJSON   string `json:"blockjson"`
+	PeerMapJSON string `json:"peermapjson"`
 }
 
 // NewHeartBeatData creates instance of heart beat
-func NewHeartBeatData(id []string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
+func NewHeartBeatData(id string, address string, blockJSON string, peerMapJSON string) *HeartBeatData {
 	return &HeartBeatData{id, address, blockJSON, peerMapJSON}
 }
 
