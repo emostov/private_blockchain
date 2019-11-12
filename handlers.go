@@ -129,7 +129,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		regData := RegisterData{AssignedID: requestBody, PeerMapJSON: SRD.PeerMapJSON}
 		w.Write(regData.EncodeRegisterDataToJSON())
 		decodedID := DecodeIDFromJSON(requestBody)
-		SRD.PeerMap = append(SRD.PeerMap, decodedID) //assume request body is id and address struct in string
+		SRD.PeerMap.AddNewPeers(decodedID)
 		SRD.EncodePeerMapToJSON()
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)

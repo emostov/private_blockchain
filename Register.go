@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 // ServerRegisterData ...
@@ -24,13 +27,14 @@ type ID struct {
 	Port    string
 }
 
+// PeerList ...
 type PeerList struct {
 	SelfID  ID
 	PeerIDs []ID
 	Length  int32
 }
 
-func (pl *PeerList) contains(otherID string) bool {
+func (pl *PeerList) contains(otherID ID) bool {
 	for _, a := range pl.PeerIDs {
 		if a == otherID {
 			return true
@@ -76,7 +80,22 @@ func DecodeIDFromJSON(idjs string) ID {
 	return id
 }
 
-// // RegisterMe
-// func RegisterMe() {
+// RegisterMe
+func DoRegistration() {
+	IDJSON := MINERID.EncodeIDToJSON()
+	resp, err := http.Post(MINERID.Address+MINERID.Port+"/peer", "application/json", bytes.NewBuffer([]byte(IDJSON)))
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if resp.StatusCode == http.StatusOK {
+		rd := DecodeRegistrationDataFromJSON(body)
+		PeerList.PeerIDs.AddNewPeers(rd.PeerMapJSON)
+	}
+}
 
-// }
+// peerlist insert peerids

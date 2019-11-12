@@ -12,14 +12,14 @@ var ServerPeerMap = []ID{MINERID, MINER2ID}
 var SID = ID{Address: "http://localhost:", Port: "6688"}
 
 //SRD is a server register data global for a server instance
-var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "", PeerMap: []string{}}
+var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "", PeerMap: []ID{}}
 
 // Bc ...
 var Bc = NewBlockChain()
 var mutex = &sync.Mutex{}
 
 // PEERLIST right now is just hard coded
-var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []string{}, Length: Bc.Length}
+var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []ID{}, Length: Bc.Length}
 
 // port options 8080 6689
 
@@ -35,7 +35,7 @@ var MINER2ID = ID{Address: "http://localhost:", Port: "8080"}
 var target = "0000000" // seven 0 ... long time
 
 // SELFADDRESS ...
-var SELFADDRESS = "http://localhost:" + SELFID[1]
+//var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
 	miner1Setup()
@@ -49,12 +49,12 @@ func miner1Setup() {
 	Bc.Insert(genesis)
 	// fmt.Println(Bc.Show())
 	//testAsk()
-	fmt.Println("I am at port ", SELFID[1])
+	fmt.Println("I am at port ", MINERID.Port)
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {
-		log.Fatal(http.ListenAndServe(":"+SELFID[1], router))
+		log.Fatal(http.ListenAndServe(":"+MINERID.Port, router))
 	}
 }
 
