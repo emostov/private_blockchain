@@ -7,9 +7,10 @@ import (
 	"os"
 )
 
-// MINERID is globabl for miner ID - port will become OS.Arg[1] when launched
-var MINERID = ID{Address: "http://localhost:", Port: "6001"}
-var miner2id = ID{Address: "http://localhost:", Port: "8001"}
+// MINERID is globabl for miner ID - ideally port will become OS.Arg[1] when launched
+// var MINERID = ID{Address: "http://localhost:", Port: "6001"}
+// var miner2id = ID{Address: "http://localhost:", Port: "8001"}
+var MINERID = makeMinerID()
 
 // ServerPeerMap Initializing with two hardcoded minors
 // var ServerPeerMap = []ID{MINERID, miner2id}
@@ -25,7 +26,7 @@ var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "[]", PeerMap: ServerPe
 var SYNCBC = NewSyncBlockChain()
 
 // PEERLIST is for the miner, so initialized with empty peer IDs
-var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []ID{}, Length: 0}
+var PEERLIST = PeerList{SelfID: makeMinerID(), PeerIDs: []ID{}, Length: 0}
 
 //var target = "000000" // six 0 fairly quick
 
@@ -41,12 +42,18 @@ func main() {
 	}
 }
 
+func makeMinerID() ID {
+	if len(os.Args) > 1 {
+		return ID{Port: os.Args[1], Address: "http://localhost:"}
+	}
+	return ID{Port: "this is server", Address: "http://localhost:"}
+}
+
 func minerSetup() {
 	genesis := makeGenesisBlock()
 	SYNCBC.Insert(genesis)
 	log.Println("LOG: I am a miner")
 	fmt.Println("LOG: My peerlist prior to registration is: ", PEERLIST.PeerIDs)
-	MINERID.Port = os.Args[1]
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))

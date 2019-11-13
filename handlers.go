@@ -67,7 +67,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// below would implement gossip protocol
 		// peermap := DecodePeerMapFromJSON(data.PeerMapJSON)
 		otherID := ID{Port: data.ID, Address: data.Address}
-		// // peermap = append(peermap, otherID)
+		// peermap = append(peermap, otherID)
 		PEERLIST.AddNewPeers([]ID{otherID})
 		PEERLIST.RemoveSelfFromPeerList()
 
