@@ -46,7 +46,9 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
+	fmt.Println("Log: About to attempt insert into block chain")
 	mutex.Lock()
+	defer mutex.Unlock()
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -62,7 +64,7 @@ func (bc *BlockChain) Insert(b Block) {
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
-	mutex.Unlock()
+
 	fmt.Println("LOG: post bc.insert Show() below ")
 	fmt.Println(bc.Show())
 
@@ -122,12 +124,6 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	// into the blochchain instance
 	var blockList []JSONShape
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
-	// fmt.Println("in decode from bc and the JSONblock list is ", JSONBlocks)
-	// fmt.Println("block list is ", blockList)
-	// for _, block := range blockList {
-	// 	fmt.Println("block string ", block)
-	// 	// fmt.Println(block.Header)
-	// }
 	if err == nil {
 		for _, shape := range blockList {
 			// create block from json
