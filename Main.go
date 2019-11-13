@@ -26,7 +26,6 @@ var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []ID{}, Length: 0}
 
 // MINERID is globabl for miner ID - port will become OS.Arg[1] when launched
 var MINERID = ID{Address: "http://localhost:", Port: "6001"}
-
 var miner2id = ID{Address: "http://localhost:", Port: "8001"}
 
 //var target = "000000" // six 0 fairly quick
