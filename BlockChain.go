@@ -21,8 +21,8 @@ func NewBlockChain() *BlockChain {
 	return &bc
 }
 
-//Get returns a blockchain instance's Height
-func (bc *BlockChain) Get(Height int32) []Block {
+//NonSyncGet  returns a blockchain instance's Height
+func (bc *BlockChain) NonSyncGet(Height int32) []Block {
 	// takes an instance of a block chain and a Height in int32
 	// returns a slice containing the blocks at that that Height or nil
 	if val, ok := bc.Chain[Height]; ok {
@@ -31,9 +31,9 @@ func (bc *BlockChain) Get(Height int32) []Block {
 	return nil
 }
 
-// GetBlock ...
-func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
-	blocksAtHeight := bc.Get(height)
+// NonSyncGetBlock ...
+func (bc *BlockChain) NonSyncGetBlock(height int32, hash string) *Block {
+	blocksAtHeight := bc.NonSyncGet(height)
 	if blocksAtHeight != nil {
 		for _, block := range blocksAtHeight {
 			if block.Header.Hash == hash {
@@ -44,11 +44,9 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 	return nil
 }
 
-//Insert inserts a block into a blockchain
-func (bc *BlockChain) Insert(b Block) {
+// NonSyncInsert inserts a block into a blockchain
+func (bc *BlockChain) NonSyncInsert(b Block) {
 	fmt.Println("Log: About to attempt insert into block chain")
-	mutex.Lock()
-	defer mutex.Unlock()
 	val, ok := bc.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
@@ -118,8 +116,8 @@ func EncodeBlockchainToJSON(bc *BlockChain) string {
 // 	Array []string
 // }
 
-//DecodeBlockchainFromJSON ...
-func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
+//NonSyncDecodeBlockchainFromJSON ...
+func (bc *BlockChain) NonSyncDecodeBlockchainFromJSON(JSONBlocks string) {
 	//takes a blockchain instance and a list of json blocks and inserts each block
 	// into the blochchain instance
 	var blockList []JSONShape
@@ -136,7 +134,7 @@ func (bc *BlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 				Hash:       shape.Hash,
 			}
 			b := Block{Header: h, Value: shape.Value}
-			bc.Insert(b)
+			bc.NonSyncInsert(b)
 		}
 		fmt.Println("no error")
 
@@ -153,7 +151,7 @@ func (bc *BlockChain) NonSyncGetLatestBlock() []Block {
 
 // NonSyncGetParentBlock takes a block as a parameter, and returns its parent block
 func (bc *BlockChain) NonSyncGetParentBlock(b *Block) *Block {
-	parentHeightBlocks := bc.Get(b.Header.Height)
+	parentHeightBlocks := bc.NonSyncGet(b.Header.Height)
 	for _, pBlock := range parentHeightBlocks {
 		if pBlock.Header.Hash == b.Header.ParentHash {
 			return &pBlock

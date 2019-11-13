@@ -16,7 +16,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		fmt.Println("Log: succesful ask for block chain")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(EncodeBlockchainToJSON(Bc)))
+		_, _ = w.Write([]byte(EncodeBlockchainToJSON(SYNCBC.BC)))
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -32,7 +32,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 		height, err := strconv.ParseInt(h, 10, 64)
 		fmt.Println("LOG: " + "ask get" + "height :" + h + ", hash: " + hash)
 		if err == nil {
-			block := Bc.GetBlock(int32(height), hash)
+			block := SYNCBC.GetBlock(int32(height), hash)
 			if block == nil {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
@@ -66,17 +66,17 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 
 		if verifyNonce(block) {
 			fmt.Println("LOG: HB Recieve: got post and nonce verified")
-			result := Bc.GetBlock(block.Header.Height, block.Header.Hash)
-			resultParent := Bc.GetBlock(block.Header.Height-1, block.Header.ParentHash)
+			result := SYNCBC.GetBlock(block.Header.Height, block.Header.Hash)
+			resultParent := SYNCBC.GetBlock(block.Header.Height-1, block.Header.ParentHash)
 			// verify if block exists already
 			if result == nil && resultParent != nil {
 				fmt.Println("LOG: HB Recieve: insert succeses: ", block.Header.Hash)
-				Bc.Insert(*block)
+				SYNCBC.Insert(*block)
 			} else if result == nil && resultParent == nil { // block does not exist and need parent
 				fmt.Println("LOG: in HBRecieve, need to ask for parent: ", block.Header.Hash)
 				strheight := strconv.Itoa(int(block.Header.Height - 1))
 				if askForParent(block.Header.ParentHash, strheight) {
-					Bc.Insert(*block)
+					SYNCBC.Insert(*block)
 				}
 			} else {
 				fmt.Println("LOG: HB Recieve: Block and parent block already exist so no insert")
@@ -102,7 +102,7 @@ func readRequestBody(r *http.Request) (string, error) {
 // ShowHandler ...
 func ShowHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(Bc.Show()))
+	w.Write([]byte(SYNCBC.BC.Show()))
 }
 
 //Start simply starts a thread for mining. Make sure to only call once!
@@ -111,7 +111,7 @@ func Start(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("LOG: I just got asked to start mining")
 	DoMinerRegistration()
 	DownloadChain()
-	go Bc.StartTryingNonces()
+	go SYNCBC.StartTryingNonces()
 	w.Write([]byte("Mining Engaged"))
 }
 

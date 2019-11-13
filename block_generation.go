@@ -10,15 +10,15 @@ import (
 )
 
 // StartTryingNonces ...
-func (bc *BlockChain) StartTryingNonces() {
+func (sbc *SyncBlockChain) StartTryingNonces() {
 	stop := false
 
 	for !stop {
-		parentBlock := bc.GetLatestBlock()[0]
+		parentBlock := sbc.GetLatestBlock()[0]
 		//fmt.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
-		b.Initialize(bc.Length+1, parentHash, "test block value")
+		b.Initialize(sbc.BC.Length+1, parentHash, "test block value")
 		blockValue := b.Value
 
 		nonce := generateStartNonce(1)
@@ -26,17 +26,17 @@ func (bc *BlockChain) StartTryingNonces() {
 		run := true
 		for run {
 			run = false
-			if bc.Length+1 == b.Header.Height {
+			if sbc.BC.Length+1 == b.Header.Height {
 
 				puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
-				if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
+				if checkPuzzleAnswerValid(TARGET, puzzleAnswer) == false {
 					nonce = generateNonce(nonce)
 					run = true
 
 				} else {
 					b.Header.Nonce = nonce
 					fmt.Println("LOG: #blockgeneration: About to insert and nonce is found")
-					Bc.Insert(b)
+					SYNCBC.Insert(b)
 					SendHeartBeat(string(b.EncodeToJSON()))
 
 					//stop = true // delete this line when running
@@ -91,16 +91,16 @@ func askForParent(parentHash string, height string) bool {
 			//fmt.Println("block string is ", string(body))
 			fmt.Println("block json is", string(b.EncodeToJSON()))
 
-			result := Bc.GetBlock(b.Header.Height, b.Header.Hash)
+			result := SYNCBC.GetBlock(b.Header.Height, b.Header.Hash)
 			if result != nil {
 				fmt.Println("LOG: askForParent succeses: ", b.Header.Hash)
-				Bc.Insert(*b)
+				SYNCBC.Insert(*b)
 				return true
 			}
 			fmt.Println("LOG: asking for another parent block #askForParent")
 			strheight := strconv.Itoa(int(b.Header.Height - 1))
 			if askForParent(b.Header.ParentHash, strheight) {
-				Bc.Insert(*b)
+				SYNCBC.Insert(*b)
 				return true
 			}
 		}
@@ -125,7 +125,7 @@ func DownloadChain() {
 		}
 		fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
 		if resp.StatusCode == http.StatusOK {
-			Bc.DecodeBlockchainFromJSON(string(body))
+			SYNCBC.DecodeBlockchainFromJSON(string(body))
 			return
 		}
 
@@ -147,7 +147,7 @@ func generateNonce(previous string) string {
 func verifyNonce(b *Block) bool {
 	puzzleAnswer :=
 		makePuzzleAnswer(b.Header.Nonce, b.Header.ParentHash, b.Value)
-	return checkPuzzleAnswerValid(target, puzzleAnswer)
+	return checkPuzzleAnswerValid(TARGET, puzzleAnswer)
 }
 
 func generateStartNonce(seed int) string {
