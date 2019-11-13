@@ -54,6 +54,15 @@ func (pl *PeerList) AddNewPeers(newPeers []ID) {
 	pl.Length = int32(len(pl.PeerIDs))
 }
 
+// RemoveSelfFromPeerList ...
+func (pl *PeerList) RemoveSelfFromPeerList() {
+	for i, id := range pl.PeerIDs {
+		if id == MINERID {
+			pl.PeerIDs = append(pl.PeerIDs[:i], pl.PeerIDs[i+1:]...)
+		}
+	}
+}
+
 // AddNewPeer ...
 func (srd *ServerRegisterData) AddNewPeer(id ID) {
 	// for _, pID := range newPeers {
@@ -126,7 +135,7 @@ func DoMinerRegistration() {
 	if err != nil {
 		log.Println(err)
 	}
-
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
@@ -135,8 +144,9 @@ func DoMinerRegistration() {
 		rd := DecodeRegisterDataFromJSON(string(body))
 		peerids := DecodePeerMapFromJSON(rd.PeerMapJSON)
 		PEERLIST.AddNewPeers(peerids)
+		PEERLIST.RemoveSelfFromPeerList()
 	}
-	defer resp.Body.Close()
+
 	fmt.Println("I just registered and my peer list is: ", PEERLIST.PeerIDs)
 }
 
