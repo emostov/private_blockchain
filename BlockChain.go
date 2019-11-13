@@ -46,6 +46,7 @@ func (bc *BlockChain) GetBlock(height int32, hash string) *Block {
 
 //Insert inserts a block into a blockchain
 func (bc *BlockChain) Insert(b Block) {
+	fmt.Println("Log: About to attempt insert into block chain")
 	mutex.Lock()
 	defer mutex.Unlock()
 	val, ok := bc.Chain[b.Header.Height]

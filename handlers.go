@@ -14,7 +14,7 @@ import (
 // Upload sends the entire json block chain
 func Upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		fmt.Println("Log: succesful ask for block chain" + MINERID.Port)
+		fmt.Println("Log: succesful ask for block chain")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(EncodeBlockchainToJSON(Bc)))
 	} else {
@@ -30,7 +30,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 		h := vars["height"]
 		hash := vars["hash"]
 		height, err := strconv.ParseInt(h, 10, 64)
-		fmt.Println("LOG: i am ", MINERID.Port, " ask get", "height :"+h+", hash: "+hash)
+		fmt.Println("LOG: " + "ask get" + "height :" + h + ", hash: " + hash)
 		if err == nil {
 			block := Bc.GetBlock(int32(height), hash)
 			if block == nil {
@@ -56,7 +56,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 
-		fmt.Println("LOG: Im getting a post request #HBrec", MINERID.Port)
+		fmt.Println("LOG: Im getting a post request #HBrec")
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
@@ -67,7 +67,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		// if block does not exist
 
 		if verifyNonce(block) {
-			fmt.Println("LOG: got post HBrec and nonce verified", MINERID.Port)
+			fmt.Println("LOG: got post HBrec and nonce verified")
 			result := Bc.GetBlock(block.Header.Height, block.Header.Hash)
 			resultParent := Bc.GetBlock(block.Header.Height-1, block.Header.ParentHash)
 			// verify if block exists already
@@ -84,7 +84,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("LOG: HB Recieve: Block and parent block already exist so no insert")
 			}
 		} else {
-			fmt.Println("LOG: got post HBrec and nonce NOT verified", MINERID.Port)
+			fmt.Println("LOG: got post HBrec and nonce NOT verified")
 		}
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)

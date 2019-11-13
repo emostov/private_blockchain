@@ -38,11 +38,11 @@ var target = "0000000" // seven 0 ... long time
 //var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	// miner1Setup()
+	miner1Setup()
 	//testDecode()
 	//test1()
 	//test3()
-	registationServerSetup()
+	// registationServerSetup()
 }
 func miner1Setup() {
 
@@ -51,6 +51,7 @@ func miner1Setup() {
 	// fmt.Println(Bc.Show())
 	//testAsk()
 	fmt.Println("LOG: I am a miner")
+	MINERID.Port = os.Args[1]
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
