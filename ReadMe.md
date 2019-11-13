@@ -4,8 +4,9 @@ Zeke Mostov
 November, 13, 2019
 
 INSTRUCTIONS TO RUN:
-Before running any nodes, registration server set up is required. To start the 
-registration simply start at command line and pass no arguments:
+Before running any nodes, registration server set up is required. This is because
+currently the node will log a fatal error if it sends request to server and it is
+not up. To start the registration simply start at command line and pass no arguments:
 
 "go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go"
 
