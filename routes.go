@@ -31,6 +31,7 @@ type Routes []Route
 
 // 	return router
 // }
+
 // NewRouter ...
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)

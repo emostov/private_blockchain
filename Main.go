@@ -8,7 +8,10 @@ import (
 	"sync"
 )
 
+// ServerPeerMap Initializing with two hardcoded minors
 var ServerPeerMap = []ID{MINERID, miner2id}
+
+// SID is the server id, which is always at 6688
 var SID = ID{Address: "http://localhost:", Port: "6688"}
 
 //SRD is a server register data global for a server instance
@@ -30,14 +33,17 @@ var miner2id = ID{Address: "http://localhost:", Port: "8001"}
 var target = "0000000" // seven 0 ... long time
 
 func main() {
-	minerSetup()
-	// registationServerSetup()
+	if len(os.Args) > 1 {
+		minerSetup()
+	} else {
+		registationServerSetup()
+	}
 }
 
 func minerSetup() {
 	genesis := makeGenesisBlock()
 	Bc.Insert(genesis)
-	fmt.Println("LOG: I am a miner")
+	log.Println("LOG: I am a miner")
 	fmt.Println("LOG: My peerlist prior to registration is: ", PEERLIST.PeerIDs)
 	MINERID.Port = os.Args[1]
 	router := NewRouter()
