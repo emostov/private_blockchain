@@ -6,19 +6,21 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
 // StartTryingNonces ...
-func (bc *BlockChain) StartTryingNonces() {
+func (sbc *SyncBlockChain) StartTryingNonces() {
+	fmt.Println("LOG: StartTryingNonces: started mining ")
 	stop := false
 
 	for !stop {
-		parentBlock := bc.GetLatestBlock()[0]
-		//fmt.Println("Just created parent block ")
+		parentBlock := sbc.GetLatestBlock()[0]
+		// fmt.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
-		b.Initialize(bc.Length+1, parentHash, "test block value")
+		b.Initialize(sbc.BC.Length+1, parentHash, "test block value")
 		blockValue := b.Value
 
 		nonce := generateStartNonce(1)
@@ -26,17 +28,17 @@ func (bc *BlockChain) StartTryingNonces() {
 		run := true
 		for run {
 			run = false
-			if bc.Length+1 == b.Header.Height {
+			if sbc.BC.Length+1 == b.Header.Height {
 
 				puzzleAnswer = makePuzzleAnswer(nonce, parentHash, blockValue)
-				if checkPuzzleAnswerValid(target, puzzleAnswer) == false {
+				if checkPuzzleAnswerValid(TARGET, puzzleAnswer) == false {
 					nonce = generateNonce(nonce)
 					run = true
 
 				} else {
 					b.Header.Nonce = nonce
-					fmt.Println("LOG: #blockgeneration: About to insert and nonce is found")
-					Bc.Insert(b)
+					fmt.Println("LOG: StartTryingNonces: About to insert and nonce is found")
+					SYNCBC.Insert(b)
 					SendHeartBeat(string(b.EncodeToJSON()))
 
 					//stop = true // delete this line when running
@@ -54,16 +56,23 @@ func SendHeartBeat(blockJSON string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	HBData := NewHeartBeatData(MINERID.Port, MINERID.Address, blockJSON, string(peerMapJSON))
+
+	HBData := NewHeartBeatData(string(os.Args[1]), MINERID.Address, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()
-	for _, id := range PEERLIST.PeerIDs {
-		fmt.Println("LOG: Sending message to peer", string(id.Port))
-		resp, err := http.Post(id.Address+id.Port+"/heartbeat/recieve", "application/json", bytes.NewBuffer(HBDataJSON))
-		if err != nil {
-			log.Print(err)
+	if len(PEERLIST.PeerIDs) >= 1 {
+		for _, id := range PEERLIST.PeerIDs {
+			fmt.Println("LOG: Sending message to peer", string(id.Port))
+			resp, err := http.Post(id.Address+id.Port+"/heartbeat/recieve", "application/json", bytes.NewBuffer(HBDataJSON))
+			if err != nil {
+				log.Print(err)
+				return
+			}
+			fmt.Println("LOG: send heart beat - status ", resp.Status)
 		}
-		fmt.Println("LOG: send heart beat - status ", resp.Status)
+	} else {
+		fmt.Println("LOG: SendHeartBeat: No peers to send heartbeat to")
 	}
+
 }
 
 func askForParent(parentHash string, height string) bool {
@@ -91,16 +100,16 @@ func askForParent(parentHash string, height string) bool {
 			//fmt.Println("block string is ", string(body))
 			fmt.Println("block json is", string(b.EncodeToJSON()))
 
-			result := Bc.GetBlock(b.Header.Height, b.Header.Hash)
+			result := SYNCBC.GetBlock(b.Header.Height, b.Header.Hash)
 			if result != nil {
 				fmt.Println("LOG: askForParent succeses: ", b.Header.Hash)
-				Bc.Insert(*b)
+				SYNCBC.Insert(*b)
 				return true
 			}
 			fmt.Println("LOG: asking for another parent block #askForParent")
 			strheight := strconv.Itoa(int(b.Header.Height - 1))
 			if askForParent(b.Header.ParentHash, strheight) {
-				Bc.Insert(*b)
+				SYNCBC.Insert(*b)
 				return true
 			}
 		}
@@ -112,23 +121,27 @@ func askForParent(parentHash string, height string) bool {
 
 // DownloadChain goes to a node in peer list and asks for entire block
 func DownloadChain() {
-	for _, id := range PEERLIST.PeerIDs {
-		fmt.Println("LOG: #download asking peer ", string(id.Port), " for chain")
-		resp, err := http.Get(id.Address + id.Port + "/Upload")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
-		if resp.StatusCode == http.StatusOK {
-			Bc.DecodeBlockchainFromJSON(string(body))
-			return
-		}
+	if len(PEERLIST.PeerIDs) >= 1 {
+		for _, id := range PEERLIST.PeerIDs {
+			fmt.Println("LOG: #download asking peer ", string(id.Port), " for chain")
+			resp, err := http.Get(id.Address + id.Port + "/Upload")
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
+			if resp.StatusCode == http.StatusOK {
+				SYNCBC.DecodeBlockchainFromJSON(string(body))
+				return
+			}
 
+		}
+	} else {
+		fmt.Println("LOG: DownloadChain: no peers to download from")
 	}
 
 }
@@ -147,7 +160,7 @@ func generateNonce(previous string) string {
 func verifyNonce(b *Block) bool {
 	puzzleAnswer :=
 		makePuzzleAnswer(b.Header.Nonce, b.Header.ParentHash, b.Value)
-	return checkPuzzleAnswerValid(target, puzzleAnswer)
+	return checkPuzzleAnswerValid(TARGET, puzzleAnswer)
 }
 
 func generateStartNonce(seed int) string {

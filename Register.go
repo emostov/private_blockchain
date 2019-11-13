@@ -11,28 +11,28 @@ import (
 
 // ServerRegisterData ...
 type ServerRegisterData struct {
-	ServerID    ID
-	PeerMapJSON string
-	PeerMap     []ID
+	ServerID    ID     `json:"serverid"`
+	PeerMapJSON string `json:"peermapjson"`
+	PeerMap     []ID   `json:"peermap"`
 }
 
 // RegisterData ...
 type RegisterData struct {
-	PeerMapJSON string
-	AssignedID  string //string of id struct
+	PeerMapJSON string `json:"peermapjson"`
+	AssignedID  string `json:"assignedid"` //string of id struct
 }
 
 // ID ..
 type ID struct {
-	Address string
-	Port    string
+	Address string `json:"address"`
+	Port    string `json:"port"`
 }
 
 // PeerList ...
 type PeerList struct {
-	SelfID  ID
-	PeerIDs []ID
-	Length  int32
+	SelfID  ID    `json:"selfid"`
+	PeerIDs []ID  `json:"peerids"`
+	Length  int32 `json:"length"`
 }
 
 func contains(PeerIDs []ID, otherID ID) bool {
@@ -76,10 +76,15 @@ func (srd *ServerRegisterData) AddNewPeer(id ID) {
 //EncodePeerMapToJSON ...
 func (srd *ServerRegisterData) EncodePeerMapToJSON() {
 	peermapjs := "["
-	for _, id := range srd.PeerMap {
-		peermapjs += (id.EncodeIDToJSON() + ",")
+	if len(srd.PeerMap) >= 1 {
+
+		for _, id := range srd.PeerMap {
+			peermapjs += (id.EncodeIDToJSON() + ",")
+		}
+		peermapjs = peermapjs[:len(peermapjs)-1] + "]"
+	} else {
+		peermapjs += "]"
 	}
-	peermapjs = peermapjs[:len(peermapjs)-1] + "]"
 	srd.PeerMapJSON = peermapjs
 }
 
