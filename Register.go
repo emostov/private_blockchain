@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,7 +19,7 @@ type ServerRegisterData struct {
 // RegisterData ...
 type RegisterData struct {
 	PeerMapJSON string
-	AssignedID  string
+	AssignedID  string //string of id struct
 }
 
 // ID ..
@@ -50,6 +51,7 @@ func (pl *PeerList) AddNewPeers(newPeers []ID) {
 			pl.PeerIDs = append(pl.PeerIDs, pID)
 		}
 	}
+	pl.Length = int32(len(pl.PeerIDs))
 }
 
 // AddNewPeer ...
@@ -124,16 +126,18 @@ func DoMinerRegistration() {
 	if err != nil {
 		log.Println(err)
 	}
-	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	if resp.StatusCode == http.StatusOK {
 		rd := DecodeRegisterDataFromJSON(string(body))
 		peerids := DecodePeerMapFromJSON(rd.PeerMapJSON)
 		PEERLIST.AddNewPeers(peerids)
 	}
+	defer resp.Body.Close()
+	fmt.Println("I just registered and my peer list is: ", PEERLIST.PeerIDs)
 }
 
 // peerlist insert peerids

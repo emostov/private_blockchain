@@ -110,10 +110,11 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 //Start simply starts a thread for mining. Make sure to only call once!
 func Start(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Println("I am at port " + MINERID.Port + ", and I just got asked to start mining")
+	fmt.Println("I just got asked to start mining")
+	DoMinerRegistration()
 	DownloadChain()
 	go Bc.StartTryingNonces()
-	w.Write([]byte("Mining Engaged for " + MINERID.Port))
+	w.Write([]byte("Mining Engaged"))
 }
 
 //Register returns registration information to node and updates SRD.PeerMap with new ID
@@ -125,7 +126,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		}
 		w.WriteHeader(http.StatusOK)
-
 		regData := RegisterData{AssignedID: requestBody, PeerMapJSON: SRD.PeerMapJSON}
 		w.Write(regData.EncodeRegisterDataToJSON())
 		decodedID := DecodeIDFromJSON(requestBody)

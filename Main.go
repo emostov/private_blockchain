@@ -12,7 +12,7 @@ var ServerPeerMap = []ID{MINERID, MINER2ID}
 var SID = ID{Address: "http://localhost:", Port: "6688"}
 
 //SRD is a server register data global for a server instance
-var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "", PeerMap: []ID{}}
+var SRD = ServerRegisterData{ServerID: SID, PeerMapJSON: "", PeerMap: ServerPeerMap}
 
 // Bc ...
 var Bc = NewBlockChain()
@@ -38,10 +38,11 @@ var target = "0000000" // seven 0 ... long time
 //var SELFADDRESS = "http://localhost:" + SELFID[1]
 
 func main() {
-	miner1Setup()
+	// miner1Setup()
 	//testDecode()
 	//test1()
 	//test3()
+	registationServerSetup()
 }
 func miner1Setup() {
 
@@ -49,7 +50,7 @@ func miner1Setup() {
 	Bc.Insert(genesis)
 	// fmt.Println(Bc.Show())
 	//testAsk()
-	fmt.Println("I am at port ", MINERID.Port)
+	fmt.Println("LOG: I am a miner")
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
@@ -59,13 +60,16 @@ func miner1Setup() {
 }
 
 func registationServerSetup() {
+	SRD.EncodePeerMapToJSON()
+	fmt.Println("Log: registration server has been started up at: ", SID.Port)
+	fmt.Println("Log: my  peermapjson is: ", SRD.PeerMap)
 	router := NewRouter()
 	if len(os.Args) > 1 {
 		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+SID.Port, router))
 	}
-	fmt.Println("Log: registration server has been started up at: ", SID.Port)
+
 }
 
 func testSetupBlockInsert() {
