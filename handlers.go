@@ -119,7 +119,7 @@ func Start(w http.ResponseWriter, r *http.Request) {
 //Register returns registration information to node and updates SRD.PeerMap with new ID
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		fmt.Println("This is the Register server and I just got a request to register")
+		fmt.Println("LOG: This is the Register server and I just got a request to register")
 		requestBody, err := readRequestBody(r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -129,9 +129,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		regData := RegisterData{AssignedID: requestBody, PeerMapJSON: SRD.PeerMapJSON}
 		w.Write(regData.EncodeRegisterDataToJSON())
 		decodedID := DecodeIDFromJSON(requestBody)
-		SRD.PeerMap.AddNewPeers(decodedID)
+		SRD.AddNewPeer(decodedID)
 		SRD.EncodePeerMapToJSON()
 	} else {
+		fmt.Println("LOG: this is the Register server and I just got a BAD request")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

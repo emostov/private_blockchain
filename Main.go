@@ -23,9 +23,9 @@ var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []ID{}, Length: Bc.Length}
 
 // port options 8080 6689
 
-var MINERID = ID{Address: "http://localhost:", Port: "6060"}
+var MINERID = ID{Address: "http://localhost:", Port: "6001"}
 
-var MINER2ID = ID{Address: "http://localhost:", Port: "8080"}
+var MINER2ID = ID{Address: "http://localhost:", Port: "8001"}
 
 //var target = "000000" // six 0 fairly quick
 
@@ -65,6 +65,7 @@ func registationServerSetup() {
 	} else {
 		log.Fatal(http.ListenAndServe(":"+SID.Port, router))
 	}
+	fmt.Println("Log: registration server has been started up at: ", SID.Port)
 }
 
 func testSetupBlockInsert() {

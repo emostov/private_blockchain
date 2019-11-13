@@ -34,13 +34,32 @@ type PeerList struct {
 	Length  int32
 }
 
-func (pl *PeerList) contains(otherID ID) bool {
-	for _, a := range pl.PeerIDs {
+func contains(PeerIDs []ID, otherID ID) bool {
+	for _, a := range PeerIDs {
 		if a == otherID {
 			return true
 		}
 	}
 	return false
+}
+
+// AddNewPeers ...
+func (pl *PeerList) AddNewPeers(newPeers []ID) {
+	for _, pID := range newPeers {
+		if !contains(pl.PeerIDs, pID) {
+			pl.PeerIDs = append(pl.PeerIDs, pID)
+		}
+	}
+}
+
+// AddNewPeer ...
+func (srd *ServerRegisterData) AddNewPeer(id ID) {
+	// for _, pID := range newPeers {
+	if !contains(srd.PeerMap, id) {
+		srd.PeerMap = append(srd.PeerMap, id)
+	}
+	// }
+	srd.EncodePeerMapToJSON()
 }
 
 //EncodePeerMapToJSON ...
@@ -62,6 +81,15 @@ func (rd *RegisterData) EncodeRegisterDataToJSON() []byte {
 	return encodedRD
 }
 
+// DecodeRegisterDataFromJSON ...
+func DecodeRegisterDataFromJSON(rdjson string) RegisterData {
+	var rd RegisterData
+	if err := json.Unmarshal([]byte(rdjson), &rd); err != nil {
+		log.Fatal(err)
+	}
+	return rd
+}
+
 // EncodeIDToJSON ...
 func (id *ID) EncodeIDToJSON() string {
 	encodedID, err := json.Marshal(id)
@@ -80,8 +108,17 @@ func DecodeIDFromJSON(idjs string) ID {
 	return id
 }
 
-// RegisterMe
-func DoRegistration() {
+// DecodePeerMapFromJSON ...
+func DecodePeerMapFromJSON(peermapjs string) []ID {
+	var peerlist []ID
+	if err := json.Unmarshal([]byte(peermapjs), &peerlist); err != nil {
+		panic(err)
+	}
+	return peerlist
+}
+
+// DoMinerRegistration register the miner with the server and updates the peer list
+func DoMinerRegistration() {
 	IDJSON := MINERID.EncodeIDToJSON()
 	resp, err := http.Post(MINERID.Address+MINERID.Port+"/peer", "application/json", bytes.NewBuffer([]byte(IDJSON)))
 	if err != nil {
@@ -93,8 +130,9 @@ func DoRegistration() {
 		log.Fatal(err)
 	}
 	if resp.StatusCode == http.StatusOK {
-		rd := DecodeRegistrationDataFromJSON(body)
-		PeerList.PeerIDs.AddNewPeers(rd.PeerMapJSON)
+		rd := DecodeRegisterDataFromJSON(string(body))
+		peerids := DecodePeerMapFromJSON(rd.PeerMapJSON)
+		PEERLIST.AddNewPeers(peerids)
 	}
 }
 
