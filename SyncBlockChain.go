@@ -17,8 +17,8 @@ type SyncBlockChain struct {
 // takes an instance of a block chain and a Height in int32
 // returns a slice containing the blocks at that that Height or nil
 func (sbc *SyncBlockChain) Get(Height int32) []Block {
-	sbc.Mux.Lock()
-	defer sbc.Mux.Unlock()
+	// sbc.Mux.Lock()
+	// defer sbc.Mux.Unlock()
 	if val, ok := sbc.BC.Chain[Height]; ok {
 		return val
 	}
@@ -28,8 +28,8 @@ func (sbc *SyncBlockChain) Get(Height int32) []Block {
 // GetBlock ...
 func (sbc *SyncBlockChain) GetBlock(height int32, hash string) *Block {
 	blocksAtHeight := sbc.Get(height)
-	sbc.Mux.Lock()
-	defer sbc.Mux.Unlock()
+	// sbc.Mux.Lock()
+	// defer sbc.Mux.Unlock()
 	if blocksAtHeight != nil {
 		for _, block := range blocksAtHeight {
 			if block.Header.Hash == hash {
@@ -47,16 +47,16 @@ func NewSyncBlockChain() *SyncBlockChain {
 
 // GetLatestBlock returns slice of blocks at chains length
 func (sbc *SyncBlockChain) GetLatestBlock() []Block {
-	sbc.Mux.Lock()
-	defer sbc.Mux.Unlock()
+	// sbc.Mux.Lock()
+	// defer sbc.Mux.Unlock()
 	ret := sbc.Get(sbc.BC.Length)
 	return ret
 }
 
 // GetParentBlock takes a block as a parameter, and returns its parent block
 func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
-	sbc.Mux.Lock()
-	defer sbc.Mux.Unlock()
+	// sbc.Mux.Lock()
+	// defer sbc.Mux.Unlock()
 	parentHeightBlocks := sbc.Get(b.Header.Height)
 
 	for _, pBlock := range parentHeightBlocks {
@@ -89,7 +89,7 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 	}
 
 	fmt.Println("LOG: post sbc.insert Show() below ")
-	fmt.Println(sbc.BC.Show())
+	//fmt.Println(sbc.BC.Show())
 
 }
 

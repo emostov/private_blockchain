@@ -62,8 +62,16 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		block := DecodeFromJSON(string(data.BlockJSON))
+		fmt.Println(" HB Recieve: address, port ", data.Address, data.ID)
 
+		// below would implement gossip protocol
+		// peermap := DecodePeerMapFromJSON(data.PeerMapJSON)
+		otherID := ID{Port: data.ID, Address: data.Address}
+		// // peermap = append(peermap, otherID)
+		PEERLIST.AddNewPeers([]ID{otherID})
+		PEERLIST.RemoveSelfFromPeerList()
+
+		block := DecodeFromJSON(string(data.BlockJSON))
 		if verifyNonce(block) {
 			fmt.Println("LOG: HB Recieve: got post and nonce verified")
 			result := SYNCBC.GetBlock(block.Header.Height, block.Header.Hash)

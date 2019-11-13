@@ -76,10 +76,15 @@ func (srd *ServerRegisterData) AddNewPeer(id ID) {
 //EncodePeerMapToJSON ...
 func (srd *ServerRegisterData) EncodePeerMapToJSON() {
 	peermapjs := "["
-	for _, id := range srd.PeerMap {
-		peermapjs += (id.EncodeIDToJSON() + ",")
+	if len(srd.PeerMap) >= 1 {
+
+		for _, id := range srd.PeerMap {
+			peermapjs += (id.EncodeIDToJSON() + ",")
+		}
+		peermapjs = peermapjs[:len(peermapjs)-1] + "]"
+	} else {
+		peermapjs += "]"
 	}
-	peermapjs = peermapjs[:len(peermapjs)-1] + "]"
 	srd.PeerMapJSON = peermapjs
 }
 
