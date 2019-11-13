@@ -126,6 +126,7 @@ func DownloadChain() {
 		fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
 		if resp.StatusCode == http.StatusOK {
 			Bc.DecodeBlockchainFromJSON(string(body))
+			return
 		}
 
 	}

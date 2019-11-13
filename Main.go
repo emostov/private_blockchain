@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-var ServerPeerMap = []ID{MINERID, MINER2ID}
+var ServerPeerMap = []ID{MINERID, miner2id}
 var SID = ID{Address: "http://localhost:", Port: "6688"}
 
 //SRD is a server register data global for a server instance
@@ -21,33 +21,24 @@ var mutex = &sync.Mutex{}
 // PEERLIST is for the miner, so initialized with empty peer IDs
 var PEERLIST = PeerList{SelfID: MINERID, PeerIDs: []ID{}, Length: 0}
 
-// port options 8080 6689
-
+// MINERID is globabl for miner ID - port will become OS.Arg[1] when launched
 var MINERID = ID{Address: "http://localhost:", Port: "6001"}
 
-var MINER2ID = ID{Address: "http://localhost:", Port: "8001"}
+var miner2id = ID{Address: "http://localhost:", Port: "8001"}
 
 //var target = "000000" // six 0 fairly quick
-
-// var SELFID = []string{"http://localhost:", "6689"}
-
-//var PEERID = []string{"http://localhost:8080"}
 var target = "0000000" // seven 0 ... long time
 
-// SELFADDRESS ...
-//var SELFADDRESS = "http://localhost:" + SELFID[1]
-
 func main() {
-	miner1Setup()
+	minerSetup()
 	// registationServerSetup()
 }
-func miner1Setup() {
 
+func minerSetup() {
 	genesis := makeGenesisBlock()
 	Bc.Insert(genesis)
-	// fmt.Println(Bc.Show())
-	//testAsk()
 	fmt.Println("LOG: I am a miner")
+	fmt.Println("LOG: My peerlist prior to registration is: ", PEERLIST.PeerIDs)
 	MINERID.Port = os.Args[1]
 	router := NewRouter()
 	if len(os.Args) > 1 {
@@ -59,7 +50,7 @@ func miner1Setup() {
 
 func registationServerSetup() {
 	SRD.EncodePeerMapToJSON()
-	fmt.Println("Log: registration server has been started up at: ", SID.Port)
+	fmt.Println("Log: this is a registration server has started up at: ", SID.Port)
 	fmt.Println("Log: my  peermapjson is: ", SRD.PeerMap)
 	router := NewRouter()
 	if len(os.Args) > 1 {

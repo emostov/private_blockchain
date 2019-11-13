@@ -131,7 +131,7 @@ func DecodePeerMapFromJSON(peermapjs string) []ID {
 // DoMinerRegistration register the miner with the server and updates the peer list
 func DoMinerRegistration() {
 	IDJSON := MINERID.EncodeIDToJSON()
-	resp, err := http.Post(MINERID.Address+MINERID.Port+"/peer", "application/json", bytes.NewBuffer([]byte(IDJSON)))
+	resp, err := http.Post(SID.Address+SID.Port+"/peer", "application/json", bytes.NewBuffer([]byte(IDJSON)))
 	if err != nil {
 		log.Println(err)
 	}
@@ -145,9 +145,9 @@ func DoMinerRegistration() {
 		peerids := DecodePeerMapFromJSON(rd.PeerMapJSON)
 		PEERLIST.AddNewPeers(peerids)
 		PEERLIST.RemoveSelfFromPeerList()
+		fmt.Println("LOG: I just registered and my peer list is: ", PEERLIST.PeerIDs)
 	}
 
-	fmt.Println("I just registered and my peer list is: ", PEERLIST.PeerIDs)
 }
 
 // peerlist insert peerids
