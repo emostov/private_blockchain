@@ -52,10 +52,12 @@ func (sbc *SyncBlockChain) StartTryingNonces() {
 
 // SendHeartBeat ...
 func SendHeartBeat(blockJSON string) {
-	peerMapJSON, err := PEERLIST.PeerListToJSON()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	//peerMapJSON, err := PEERLIST.PeerListToJSON()
+	peerMapJSON := EncodeIDListToJSON(PEERLIST.PeerIDs)
+
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 
 	HBData := NewHeartBeatData(string(os.Args[1]), MINERID.Address, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()

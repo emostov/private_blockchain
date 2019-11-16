@@ -28,15 +28,6 @@ func (hbd *HeartBeatData) HBDataToJSON() ([]byte, error) {
 	return value, nil
 }
 
-// PeerListToJSON ....
-func (pl *PeerList) PeerListToJSON() ([]byte, error) {
-	value, err := json.Marshal(pl)
-	if err != nil {
-		return []byte{}, errors.New("Cannot encode PeerList to Json")
-	}
-	return value, nil
-}
-
 // EncodeToJSON converts heart beat data to json string
 func (hbd *HeartBeatData) EncodeToJSON() string {
 	var encoded []byte

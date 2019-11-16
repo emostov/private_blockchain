@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -63,6 +64,15 @@ func (pl *PeerList) RemoveSelfFromPeerList() {
 	}
 }
 
+// PeerListToJSON ....
+func (pl *PeerList) PeerListToJSON() ([]byte, error) {
+	value, err := json.Marshal(pl)
+	if err != nil {
+		return []byte{}, errors.New("Cannot encode PeerList to Json")
+	}
+	return value, nil
+}
+
 // AddNewPeer ...
 func (srd *ServerRegisterData) AddNewPeer(id ID) {
 	// for _, pID := range newPeers {
@@ -86,6 +96,21 @@ func (srd *ServerRegisterData) EncodePeerMapToJSON() {
 		peermapjs += "]"
 	}
 	srd.PeerMapJSON = peermapjs
+}
+
+// EncodeIDListToJSON Converts a slice of IDs to JSON string
+func EncodeIDListToJSON(idList []ID) string {
+	peermapjs := "["
+	if len(idList) >= 1 {
+
+		for _, id := range idList {
+			peermapjs += (id.EncodeIDToJSON() + ",")
+		}
+		peermapjs = peermapjs[:len(peermapjs)-1] + "]"
+	} else {
+		peermapjs += "]"
+	}
+	return peermapjs
 }
 
 //EncodeRegisterDataToJSON ...
