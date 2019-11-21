@@ -39,13 +39,16 @@ func main() {
 	} else {
 		registationServerSetup()
 	}
-}
 
+}
+func testAsk() {
+	askForParent("97611bc0a6e098f600d4c776252ffc16173058b4d5e2ae4a7d336fe18eb7f11326b2ca4e40be4c5572800ca76c6cdf4b65931b297f098f73a256f497c8907736", "1")
+}
 func makeMinerID() ID {
 	if len(os.Args) > 1 {
 		return ID{Port: os.Args[1], Address: "http://localhost:"}
 	}
-	return ID{Port: "6688", Address: "http://localhost:"}
+	return SID // ID{Port: "6688", Address: "http://localhost:"}
 }
 
 func minerSetup() {

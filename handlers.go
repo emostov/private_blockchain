@@ -123,19 +123,21 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		DoMinerRegistration()
 		DownloadChain()
 	}
-	go SYNCBC.StartTryingNonces()
+	//go SYNCBC.StartTryingNonces()
+	testAsk()
 	w.Write([]byte("LOG: Start: Mining Engaged"))
+
 }
 
 //StartServer for the server node
-func StartServer(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	log.Println("LOG: I am server, I just got asked to start mining")
-	// DoMinerRegistration()
-	// DownloadChain()
-	go SYNCBC.StartTryingNonces()
-	w.Write([]byte("Server Mining Engaged"))
-}
+// func StartServer(w http.ResponseWriter, r *http.Request) {
+// 	w.WriteHeader(http.StatusOK)
+// 	log.Println("LOG: I am server, I just got asked to start mining")
+// 	// DoMinerRegistration()
+// 	// DownloadChain()
+// 	go SYNCBC.StartTryingNonces()
+// 	w.Write([]byte("Server Mining Engaged"))
+// }
 
 //Register returns registration information to node and updates SRD.PeerMap with new ID
 func Register(w http.ResponseWriter, r *http.Request) {

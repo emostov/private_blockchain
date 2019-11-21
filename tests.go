@@ -2,12 +2,12 @@ package main
 
 // import "fmt"
 
-// func testSetupBlockInsert() {
-// 	var blocks = makeTenBlocks()
-// 	Bc.Insert(blocks[0])
-// 	Bc.Insert(blocks[1])
-// 	Bc.Insert(blocks[2])
-// }
+func testSetupBlockInsert() {
+	var blocks = makeTenBlocks()
+	SYNCBC.Insert(blocks[0])
+	SYNCBC.Insert(blocks[1])
+	SYNCBC.Insert(blocks[2])
+}
 
 // func testDecode() {
 // 	bc := NewBlockChain()
@@ -36,9 +36,9 @@ package main
 
 // }
 
-// func testAsk() {
-// 	askForParent("97611bc0a6e098f600d4c776252ffc16173058b4d5e2ae4a7d336fe18eb7f11326b2ca4e40be4c5572800ca76c6cdf4b65931b297f098f73a256f497c8907736", "1")
-// }
+func testAsk() {
+	askForParent("97611bc0a6e098f600d4c776252ffc16173058b4d5e2ae4a7d336fe18eb7f11326b2ca4e40be4c5572800ca76c6cdf4b65931b297f098f73a256f497c8907736", "1")
+}
 
 // // func test2() {
 // // 	// testing insertion of a block into the block chain

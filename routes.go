@@ -87,10 +87,10 @@ var routes = Routes{
 		"/peer",
 		Register,
 	},
-	Route{
-		"Startserver",
-		"GET",
-		"/startserver",
-		StartServer,
-	},
+	// Route{
+	// 	"Startserver",
+	// 	"GET",
+	// 	"/startserver",
+	// 	StartServer,
+	// },
 }
