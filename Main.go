@@ -50,8 +50,7 @@ func makeMinerID() ID {
 }
 
 func minerSetup() {
-	genesis := makeGenesisBlock()
-	SYNCBC.Insert(genesis)
+
 	log.Println("LOG: I am a miner")
 	fmt.Println("LOG: My peerlist prior to registration is: ", PEERLIST.PeerIDs)
 	router := NewRouter()
@@ -63,8 +62,10 @@ func minerSetup() {
 }
 
 func registationServerSetup() {
+	genesis := makeGenesisBlock()
+	SYNCBC.Insert(genesis)
 	SRD.EncodePeerMapToJSON()
-	fmt.Println("Log: this is a registration server has started up at: ", SID.Port)
+	fmt.Println("Log: this is a registration Node has started up at: ", SID.Port)
 	fmt.Println("Log: my  peermapjson is: ", SRD.PeerMap)
 	router := NewRouter()
 	if len(os.Args) > 1 {

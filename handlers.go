@@ -62,7 +62,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		fmt.Println(" HB Recieve: address, port ", data.Address, data.ID)
+		fmt.Println("LOG: HB Recieve: address, port ", data.Address, data.ID)
 
 		// below would implement gossip protocol
 		// peermap := DecodePeerMapFromJSON(data.PeerMapJSON)

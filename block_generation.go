@@ -123,28 +123,28 @@ func askForParent(parentHash string, height string) bool {
 
 // DownloadChain goes to a node in peer list and asks for entire block
 func DownloadChain() {
-	if len(PEERLIST.PeerIDs) >= 1 {
-		for _, id := range PEERLIST.PeerIDs {
-			fmt.Println("LOG: #download asking peer ", string(id.Port), " for chain")
-			resp, err := http.Get(id.Address + id.Port + "/Upload")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
-			if resp.StatusCode == http.StatusOK {
-				SYNCBC.DecodeBlockchainFromJSON(string(body))
-				return
-			}
-
-		}
-	} else {
-		fmt.Println("LOG: DownloadChain: no peers to download from")
+	// if len(PEERLIST.PeerIDs) >= 1 {
+	// for _, id := range PEERLIST.PeerIDs {
+	fmt.Println("LOG: DownloadChain: asking peer ", string(SID.Port), " for chain")
+	resp, err := http.Get(SID.Address + SID.Port + "/Upload")
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Log: in DonwloadChain status code is: " + string(resp.Status))
+	if resp.StatusCode == http.StatusOK {
+		SYNCBC.DecodeBlockchainFromJSON(string(body))
+		return
+	}
+
+	// }
+	// } else {
+	// 	fmt.Println("LOG: DownloadChain: no peers to download from")
+	// }
 
 }
 
