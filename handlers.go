@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,7 @@ import (
 // Upload sends the entire json block chain
 func Upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		fmt.Println("Log: succesful ask for block chain")
+		log.Println("Log: succesful ask for block chain")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(EncodeBlockchainToJSON(SYNCBC.BC)))
 	} else {
@@ -30,7 +31,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 		h := vars["height"]
 		hash := vars["hash"]
 		height, err := strconv.ParseInt(h, 10, 64)
-		fmt.Println("LOG: " + "ask get" + "height :" + h + ", hash: " + hash)
+		log.Println("LOG: " + "ask get" + "height :" + h + ", hash: " + hash)
 		if err == nil {
 			block := SYNCBC.GetBlock(int32(height), hash)
 			if block == nil {
@@ -74,24 +75,24 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 
 		block := DecodeFromJSON(string(data.BlockJSON))
 		if verifyNonce(block) {
-			fmt.Println("LOG: HB Recieve: got post and nonce verified")
+			log.Println("LOG: HB Recieve: got post and nonce verified")
 			result := SYNCBC.GetBlock(block.Header.Height, block.Header.Hash)
 			resultParent := SYNCBC.GetBlock(block.Header.Height-1, block.Header.ParentHash)
 			// verify if block exists already
 			if result == nil && resultParent != nil {
-				fmt.Println("LOG: HB Recieve: insert succeses: ", block.Header.Hash)
+				log.Println("LOG: HB Recieve: insert succeses: ", block.Header.Hash)
 				SYNCBC.Insert(*block)
 			} else if result == nil && resultParent == nil { // block does not exist and need parent
-				fmt.Println("LOG: in HBRecieve, need to ask for parent: ", block.Header.Hash)
+				log.Println("LOG: in HBRecieve, need to ask for parent: ", block.Header.Hash)
 				strheight := strconv.Itoa(int(block.Header.Height - 1))
 				if askForParent(block.Header.ParentHash, strheight) {
 					SYNCBC.Insert(*block)
 				}
 			} else {
-				fmt.Println("LOG: HB Recieve: Block and parent block already exist so no insert")
+				log.Println("LOG: HB Recieve: Block and parent block already exist so no insert")
 			}
 		} else {
-			fmt.Println("LOG: HB Recieve: got post and nonce NOT verified")
+			log.Println("LOG: HB Recieve: got post and nonce NOT verified")
 		}
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -117,17 +118,19 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 //Start simply starts a thread for mining. Make sure to only call once!
 func Start(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Println("LOG: I just got asked to start mining")
-	DoMinerRegistration()
-	DownloadChain()
+	log.Println("LOG: Start: I just got asked to start mining")
+	if MINERID.Port != "6688" {
+		DoMinerRegistration()
+		DownloadChain()
+	}
 	go SYNCBC.StartTryingNonces()
-	w.Write([]byte("Mining Engaged"))
+	w.Write([]byte("LOG: Start: Mining Engaged"))
 }
 
 //StartServer for the server node
 func StartServer(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Println("LOG: I am server, I just got asked to start mining")
+	log.Println("LOG: I am server, I just got asked to start mining")
 	// DoMinerRegistration()
 	// DownloadChain()
 	go SYNCBC.StartTryingNonces()
@@ -137,7 +140,7 @@ func StartServer(w http.ResponseWriter, r *http.Request) {
 //Register returns registration information to node and updates SRD.PeerMap with new ID
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		fmt.Println("LOG: This is the Register server and I just got a request to register")
+		log.Println("LOG: This is the Register server and I just got a request to register")
 		requestBody, err := readRequestBody(r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -149,7 +152,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		SRD.AddNewPeer(decodedID)
 		SRD.EncodePeerMapToJSON()
 	} else {
-		fmt.Println("LOG: this is the Register server and I just got a BAD request")
+		log.Println("LOG: this is the Register server and I just got a BAD request")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

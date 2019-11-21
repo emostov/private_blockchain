@@ -66,7 +66,7 @@ var routes = Routes{
 	Route{
 		"Show",
 		"GET",
-		"/Show",
+		"/show",
 		ShowHandler,
 	},
 	Route{
@@ -90,7 +90,7 @@ var routes = Routes{
 	Route{
 		"Startserver",
 		"GET",
-		"/Startserver",
+		"/startserver",
 		StartServer,
 	},
 }
