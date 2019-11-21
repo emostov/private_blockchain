@@ -87,4 +87,10 @@ var routes = Routes{
 		"/peer",
 		Register,
 	},
+	Route{
+		"Startserver",
+		"GET",
+		"/Startserver",
+		StartServer,
+	},
 }

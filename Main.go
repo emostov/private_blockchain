@@ -46,7 +46,7 @@ func makeMinerID() ID {
 	if len(os.Args) > 1 {
 		return ID{Port: os.Args[1], Address: "http://localhost:"}
 	}
-	return ID{Port: "this is server", Address: "http://localhost:"}
+	return ID{Port: "6688", Address: "http://localhost:"}
 }
 
 func minerSetup() {
@@ -54,11 +54,11 @@ func minerSetup() {
 	log.Println("LOG: I am a miner")
 	fmt.Println("LOG: My peerlist prior to registration is: ", PEERLIST.PeerIDs)
 	router := NewRouter()
-	if len(os.Args) > 1 {
-		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
-	} else {
-		log.Fatal(http.ListenAndServe(":"+MINERID.Port, router))
-	}
+	// if len(os.Args) > 1 {
+	log.Fatal(http.ListenAndServe(":"+MINERID.Port, router))
+	// 	} else {
+	// 		log.Fatal(http.ListenAndServe(":"+MINERID.Port, router))
+	// 	}
 }
 
 func registationServerSetup() {
@@ -68,10 +68,9 @@ func registationServerSetup() {
 	fmt.Println("Log: this is a registration Node has started up at: ", SID.Port)
 	fmt.Println("Log: my  peermapjson is: ", SRD.PeerMap)
 	router := NewRouter()
-	if len(os.Args) > 1 {
-		log.Fatal(http.ListenAndServe(":"+os.Args[1], router))
-	} else {
-		log.Fatal(http.ListenAndServe(":"+SID.Port, router))
-	}
-
+	// if len(os.Args) > 1 {
+	// 	log.Fatal(http.ListenAndServe(":"+MINERID.Port, router))
+	// } else {
+	log.Fatal(http.ListenAndServe(":"+SID.Port, router))
+	// }
 }

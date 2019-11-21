@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
+	"time"
 )
 
 // StartTryingNonces ...
@@ -59,7 +59,7 @@ func SendHeartBeat(blockJSON string) {
 	// 	log.Fatalln(err)
 	// }
 
-	HBData := NewHeartBeatData(string(os.Args[1]), MINERID.Address, blockJSON, string(peerMapJSON))
+	HBData := NewHeartBeatData(MINERID.Port, MINERID.Address, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()
 	if len(PEERLIST.PeerIDs) >= 1 {
 		for _, id := range PEERLIST.PeerIDs {
@@ -87,7 +87,10 @@ func askForParent(parentHash string, height string) bool {
 	}
 	for _, id := range PEERLIST.PeerIDs {
 		fmt.Println("LOG: sending get request in askForParent", string(id.Port))
-		resp, err := http.Get(id.Address + id.Port + "/block/" + height + "/" + parentHash)
+		client := http.Client{
+			Timeout: 5 * time.Second,
+		}
+		resp, err := client.Get(id.Address + id.Port + "/block/" + height + "/" + parentHash)
 		if err != nil {
 			log.Fatalln(err)
 		}
