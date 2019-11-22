@@ -4,9 +4,9 @@ package main
 
 // func testSetupBlockInsert() {
 // 	var blocks = makeTenBlocks()
-// 	Bc.Insert(blocks[0])
-// 	Bc.Insert(blocks[1])
-// 	Bc.Insert(blocks[2])
+// 	SYNCBC.Insert(blocks[0])
+// 	SYNCBC.Insert(blocks[1])
+// 	SYNCBC.Insert(blocks[2])
 // }
 
 // func testDecode() {

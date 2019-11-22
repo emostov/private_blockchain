@@ -33,6 +33,7 @@ func makeSha256Digest(m string) string {
 //JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
+	Difficulty string `json:"difficulty"` // target
 	Nonce      string `json:"nonce"`
 	Height     int32  `json:"height"`
 	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
@@ -44,6 +45,7 @@ type JSONShape struct {
 
 //Header Struct describing the fields of the header
 type Header struct {
+	Difficulty string `json:"difficulty"` // target
 	Nonce      string `json:"nonce"`
 	Height     int32  `json:"height"`
 	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
@@ -61,19 +63,19 @@ type Block struct {
 //Header tools
 
 // NewHeader is used to create and initialize a heder
-func NewHeader(Height int32, pHash string) Header {
+func NewHeader(Height int32, pHash string, difficulty string) Header {
 	// returns a header after given Height and parent Hash
 	// called by the block initialization method
 	time := int64(time.Now().Unix())
-	return Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32)}
+	return Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32), Difficulty: difficulty}
 }
 
 // Initialize an instance of a block
-func (b *Block) Initialize(Height int32, ParentHash string, value string) {
+func (b *Block) Initialize(Height int32, ParentHash string, value string, difficulty string) {
 	// takes a block, its Height, its ParentHash, and value and intializes it with
 	// header containing Hash
 	b.Value = value
-	b.Header = NewHeader(Height, ParentHash)
+	b.Header = NewHeader(Height, ParentHash, difficulty)
 	HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
 	digest := makeSha256Digest(HashStr)
 	b.Header.Hash = digest
@@ -83,6 +85,7 @@ func (b *Block) Initialize(Height int32, ParentHash string, value string) {
 func (b *Block) EncodeToJSON() []byte {
 	// takes a block pointer and returns an json encoded string of the block
 	shape := JSONShape{
+		Difficulty: b.Header.Difficulty,
 		Nonce:      b.Header.Nonce,
 		Height:     b.Header.Height,
 		Timestamp:  b.Header.Timestamp,
@@ -106,6 +109,7 @@ func DecodeFromJSON(m string) *Block {
 	var shape JSONShape
 	json.Unmarshal([]byte(m), &shape)
 	h := Header{
+		Difficulty: shape.Difficulty,
 		Nonce:      shape.Nonce,
 		Height:     shape.Height,
 		Timestamp:  shape.Timestamp,

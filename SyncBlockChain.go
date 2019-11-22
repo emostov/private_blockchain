@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 )
@@ -69,14 +68,14 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 
 //Insert inserts a block into a blockchain, checks for duplicates and updates length
 func (sbc *SyncBlockChain) Insert(b Block) {
-	fmt.Println("Log: About to attempt insert into block chain")
+	log.Println("Log: About to attempt insert into block chain")
 	sbc.Mux.Lock()
 	defer sbc.Mux.Unlock()
 	val, ok := sbc.BC.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
-				fmt.Println("Log: In Insert and block was not inserted because duplicate")
+				log.Println("Log: In Insert and block was not inserted because duplicate")
 				return
 			}
 		}
@@ -88,7 +87,7 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 		sbc.BC.Length = b.Header.Height
 	}
 
-	fmt.Println("LOG: post sbc.insert Show() below ")
+	//.Println("LOG: post sbc.insert Show() below ")
 	//fmt.Println(sbc.BC.Show())
 
 }
@@ -113,7 +112,7 @@ func (sbc *SyncBlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 			b := Block{Header: h, Value: shape.Value}
 			sbc.Insert(b)
 		}
-		fmt.Println("LOG: DecodeBlockchainFromJSON: Succesful decode and inserts ")
+		log.Println("LOG: DecodeBlockchainFromJSON: Succesful decode and inserts ")
 
 	} else {
 		log.Fatalln(err)

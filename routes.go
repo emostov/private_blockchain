@@ -66,7 +66,7 @@ var routes = Routes{
 	Route{
 		"Show",
 		"GET",
-		"/Show",
+		"/show",
 		ShowHandler,
 	},
 	Route{
@@ -86,5 +86,11 @@ var routes = Routes{
 		"POST",
 		"/peer",
 		Register,
+	},
+	Route{
+		"Starttest",
+		"GET",
+		"/startserver",
+		Starttest,
 	},
 }

@@ -1,4 +1,7 @@
-Bare Bones Private Block Chain
+Bare Bones Block Chain
+
+TODO: add notes about timeout on askforblock, difficulty field, starting 
+register node mining, downloads bc from registration node, and how gossip protocol is implemented
 
 Zeke Mostov
 November, 13, 2019
