@@ -69,6 +69,10 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 //Insert inserts a block into a blockchain, checks for duplicates and updates length
 func (sbc *SyncBlockChain) Insert(b Block) {
 	log.Println("Log: About to attempt insert into block chain")
+	if b.Header.Height >= 1 {
+		b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
+	}
+
 	sbc.Mux.Lock()
 	defer sbc.Mux.Unlock()
 	val, ok := sbc.BC.Chain[b.Header.Height]
