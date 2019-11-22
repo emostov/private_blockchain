@@ -8,8 +8,8 @@ import (
 	"strconv"
 )
 
-// ShowCanonical displays canonical chain
-func (blockchain *BlockChain) ShowCanonical() string {
+// ShowCanonicalOld displays canonical chain
+func (blockchain *BlockChain) ShowCanonicalOld() string {
 	rs := ""
 	var idList []int
 	for id := range blockchain.Chain {
@@ -35,8 +35,27 @@ func (blockchain *BlockChain) ShowCanonical() string {
 	return rs
 }
 
+// ShowCanonical displays and returs string form o canonical chain
+func (sbc *SyncBlockChain) ShowCanonical() string {
+	rs := ""
+	canonicalChains := sbc.getCanonicalChain()
+	if len(canonicalChains) > 1 {
+		rs += "Fork not resolved yet. There are multiple eligible chains." + "\n"
+	} else {
+		rs += "There is a canoincal chain." + "\n"
+	}
+	for i, bSlice := range canonicalChains {
+		rs += "Chain: " + string(i) + "\n"
+		for _, bStr := range bSlice {
+			rs += fmt.Sprintf("%s, ", bStr)
+			//rs += bStr + "\n"
+		}
+	}
+	return rs
+}
+
 // GetCanonicalChain returns array representing canonical chain
-func (sbc *SyncBlockChain) GetCanonicalChain() [][]string {
+func (sbc *SyncBlockChain) getCanonicalChain() [][]string {
 	maxHeight := int32(-1)
 	var maxBlocks []Block
 	for _, block := range sbc.Get(sbc.BC.Length) {
@@ -50,13 +69,13 @@ func (sbc *SyncBlockChain) GetCanonicalChain() [][]string {
 	returnString := [][]string{}
 	for _, block := range maxBlocks {
 		hashs := []string{}
-		for block.Header.Height >= 0 {
+		for block.Header.Height >= 1 {
 			hashs = append(hashs, "height="+strconv.Itoa(int(block.Header.Height))+
 				", timestamp="+strconv.Itoa(int(block.Header.Timestamp))+
 				", hash="+block.Header.Hash+
 				", parentHash="+block.Header.ParentHash+
 				", size="+strconv.Itoa(int(block.Header.Size)))
-			block = *sbc.GetParentBlock(&block)
+			block = *(sbc.GetParentBlock(&block))
 		}
 		returnString = append(returnString, hashs)
 	}

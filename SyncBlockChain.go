@@ -53,6 +53,10 @@ func (sbc *SyncBlockChain) GetLatestBlock() []Block {
 
 // GetParentBlock takes a block as a parameter, and returns its parent block
 func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
+	if !(b.Header.Height >= int32(1)) {
+		log.Println("Log: GetParentBlock: err Block height zero, so no parent")
+		return nil
+	}
 	parentHeightBlocks := sbc.Get(b.Header.Height - int32(1))
 
 	for _, pBlock := range parentHeightBlocks {
