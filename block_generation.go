@@ -19,7 +19,7 @@ func (sbc *SyncBlockChain) StartTryingNonces() {
 		// log.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
-		b.Initialize(sbc.BC.Length+1, parentHash, "test block value")
+		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", TARGET)
 		blockValue := b.Value
 
 		nonce := generateStartNonce(1)
@@ -91,7 +91,7 @@ func askForParent(parentHash string, height string) bool {
 		}
 		resp, err := client.Get(id.Address + id.Port + "/block/" + height + "/" + parentHash)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
@@ -105,7 +105,7 @@ func askForParent(parentHash string, height string) bool {
 			log.Println("block json is", string(b.EncodeToJSON()))
 
 			result := SYNCBC.GetBlock(b.Header.Height, b.Header.Hash)
-			if result != nil {
+			if result != nil || b.Header.Height == 0 {
 				log.Println("LOG: askForParent succeses: ", b.Header.Hash)
 				SYNCBC.Insert(*b)
 				return true
@@ -113,13 +113,14 @@ func askForParent(parentHash string, height string) bool {
 			log.Println("LOG: asking for another parent block #askForParent")
 			strheight := strconv.Itoa(int(b.Header.Height - 1))
 			if askForParent(b.Header.ParentHash, strheight) {
+				log.Println("LOG: askForParent succeses: ", b.Header.Hash)
 				SYNCBC.Insert(*b)
 				return true
 			}
 		}
 
 	}
-	log.Println("ask for parent does not work")
+	log.Println("ask for parent does not mpy succesful")
 	return false
 }
 
@@ -130,7 +131,7 @@ func DownloadChain() {
 	log.Println("LOG: DownloadChain: asking peer ", string(SID.Port), " for chain")
 	resp, err := http.Get(SID.Address + SID.Port + "/Upload")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,13 +56,13 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 
-		fmt.Println("LOG: HB Recieve: Im getting a post request ")
+		log.Println("LOG: HB Recieve: Im getting a post request ")
 		//run = false
 		s := string(requestBody)
 		data := HeartBeatData{}
 		json.Unmarshal([]byte(s), &data)
 		_, _ = w.Write([]byte(requestBody))
-		fmt.Println("LOG: HB Recieve: address, port ", data.Address, data.ID)
+		log.Println("LOG: HB Recieve: address, port ", data.Address, data.ID)
 
 		// below would implement gossip protocol
 		// peermap := DecodePeerMapFromJSON(data.PeerMapJSON)
@@ -123,21 +122,22 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		DoMinerRegistration()
 		DownloadChain()
 	}
-	//go SYNCBC.StartTryingNonces()
-	testAsk()
+	go SYNCBC.StartTryingNonces()
+
 	w.Write([]byte("LOG: Start: Mining Engaged"))
 
 }
 
-//StartServer for the server node
-// func StartServer(w http.ResponseWriter, r *http.Request) {
-// 	w.WriteHeader(http.StatusOK)
-// 	log.Println("LOG: I am server, I just got asked to start mining")
-// 	// DoMinerRegistration()
-// 	// DownloadChain()
-// 	go SYNCBC.StartTryingNonces()
-// 	w.Write([]byte("Server Mining Engaged"))
-// }
+// Starttest just for doing test ask right now
+func Starttest(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	log.Println("LOG: I am server, I just got asked to start mining")
+	DoMinerRegistration()
+	// DownloadChain()
+	// go SYNCBC.StartTryingNonces()
+	w.Write([]byte("Server Mining Engaged"))
+	testAsk()
+}
 
 //Register returns registration information to node and updates SRD.PeerMap with new ID
 func Register(w http.ResponseWriter, r *http.Request) {
