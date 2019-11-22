@@ -35,6 +35,34 @@ func (blockchain *BlockChain) ShowCanonical() string {
 	return rs
 }
 
+// GetCanonicalChain returns array representing canonical chain
+func (sbc *SyncBlockChain) GetCanonicalChain() [][]string {
+	maxHeight := int32(-1)
+	var maxBlocks []Block
+	for _, block := range sbc.Get(sbc.BC.Length) {
+		if block.Header.Difficulty > maxHeight {
+			maxHeight = block.Header.Difficulty
+			maxBlocks = []Block{block}
+		} else if block.Header.Difficulty == maxHeight {
+			maxBlocks = append(maxBlocks, block)
+		}
+	}
+	returnString := [][]string{}
+	for _, block := range maxBlocks {
+		hashs := []string{}
+		for block.Header.Height >= 0 {
+			hashs = append(hashs, "height="+strconv.Itoa(int(block.Header.Height))+
+				", timestamp="+strconv.Itoa(int(block.Header.Timestamp))+
+				", hash="+block.Header.Hash+
+				", parentHash="+block.Header.ParentHash+
+				", size="+strconv.Itoa(int(block.Header.Size)))
+			block = *sbc.GetParentBlock(&block)
+		}
+		returnString = append(returnString, hashs)
+	}
+	return returnString
+}
+
 //Show displays the blockchain
 func (blockchain *BlockChain) Show() string {
 	rs := ""

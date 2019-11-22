@@ -16,19 +16,20 @@ type SyncBlockChain struct {
 // takes an instance of a block chain and a Height in int32
 // returns a slice containing the blocks at that that Height or nil
 func (sbc *SyncBlockChain) Get(Height int32) []Block {
-	// sbc.Mux.Lock()
-	// defer sbc.Mux.Unlock()
+	sbc.Mux.Lock()
+	defer sbc.Mux.Unlock()
 	if val, ok := sbc.BC.Chain[Height]; ok {
 		return val
 	}
 	return nil
 }
 
-// GetBlock ...
+// GetBlock uses a lock and the rest of the retrieval methods for SyncBC
+// use get to interact with the chain
 func (sbc *SyncBlockChain) GetBlock(height int32, hash string) *Block {
 	blocksAtHeight := sbc.Get(height)
-	// sbc.Mux.Lock()
-	// defer sbc.Mux.Unlock()
+	sbc.Mux.Lock()
+	defer sbc.Mux.Unlock()
 	if blocksAtHeight != nil {
 		for _, block := range blocksAtHeight {
 			if block.Header.Hash == hash {
@@ -46,17 +47,13 @@ func NewSyncBlockChain() *SyncBlockChain {
 
 // GetLatestBlock returns slice of blocks at chains length
 func (sbc *SyncBlockChain) GetLatestBlock() []Block {
-	// sbc.Mux.Lock()
-	// defer sbc.Mux.Unlock()
 	ret := sbc.Get(sbc.BC.Length)
 	return ret
 }
 
 // GetParentBlock takes a block as a parameter, and returns its parent block
 func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
-	// sbc.Mux.Lock()
-	// defer sbc.Mux.Unlock()
-	parentHeightBlocks := sbc.Get(b.Header.Height)
+	parentHeightBlocks := sbc.Get(b.Header.Height - int32(1))
 
 	for _, pBlock := range parentHeightBlocks {
 		if pBlock.Header.Hash == b.Header.ParentHash {
@@ -68,9 +65,10 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 
 //Insert inserts a block into a blockchain, checks for duplicates and updates length
 func (sbc *SyncBlockChain) Insert(b Block) {
-	log.Println("Log: About to attempt insert into block chain")
+	log.Println("Log: Insert: Begin insert attempt")
 	if b.Header.Height >= 1 {
 		b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
+		// fmt.Println(sbc.GetParentBlock(&b))
 	}
 
 	sbc.Mux.Lock()
@@ -79,13 +77,14 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
-				log.Println("Log: In Insert and block was not inserted because duplicate")
+				log.Println("Log: Insert: block was not inserted because duplicate")
 				return
 			}
 		}
 	}
 
 	sbc.BC.Chain[b.Header.Height] = append(sbc.BC.Chain[b.Header.Height], b)
+	log.Println("Log: Insert: succesful insert for: " + b.Header.Hash)
 
 	if b.Header.Height > sbc.BC.Length {
 		sbc.BC.Length = b.Header.Height
@@ -93,7 +92,6 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 
 	//.Println("LOG: post sbc.insert Show() below ")
 	//fmt.Println(sbc.BC.Show())
-
 }
 
 //DecodeBlockchainFromJSON ...
