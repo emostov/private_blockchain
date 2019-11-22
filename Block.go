@@ -33,7 +33,7 @@ func makeSha256Digest(m string) string {
 //JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
-	Difficulty string `json:"difficulty"` // target
+	Difficulty int32  `json:"difficulty"` // target
 	Nonce      string `json:"nonce"`
 	Height     int32  `json:"height"`
 	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
@@ -45,7 +45,7 @@ type JSONShape struct {
 
 //Header Struct describing the fields of the header
 type Header struct {
-	Difficulty string `json:"difficulty"` // target
+	Difficulty int32  `json:"difficulty"` // target
 	Nonce      string `json:"nonce"`
 	Height     int32  `json:"height"`
 	Timestamp  int64  `json:"timestamp"` // Unix Timestamp
@@ -63,7 +63,7 @@ type Block struct {
 //Header tools
 
 // NewHeader is used to create and initialize a heder
-func NewHeader(Height int32, pHash string, difficulty string) Header {
+func NewHeader(Height int32, pHash string, difficulty int32) Header {
 	// returns a header after given Height and parent Hash
 	// called by the block initialization method
 	time := int64(time.Now().Unix())
@@ -71,7 +71,7 @@ func NewHeader(Height int32, pHash string, difficulty string) Header {
 }
 
 // Initialize an instance of a block
-func (b *Block) Initialize(Height int32, ParentHash string, value string, difficulty string) {
+func (b *Block) Initialize(Height int32, ParentHash string, value string, difficulty int32) {
 	// takes a block, its Height, its ParentHash, and value and intializes it with
 	// header containing Hash
 	b.Value = value

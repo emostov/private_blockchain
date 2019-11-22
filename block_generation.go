@@ -19,7 +19,7 @@ func (sbc *SyncBlockChain) StartTryingNonces() {
 		// log.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
-		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", TARGET)
+		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", int32(0))
 		blockValue := b.Value
 
 		nonce := generateStartNonce(1)

@@ -111,7 +111,7 @@ func readRequestBody(r *http.Request) (string, error) {
 // ShowHandler ...
 func ShowHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(SYNCBC.BC.Show()))
+	w.Write([]byte(SYNCBC.BC.ShowCanonical()))
 }
 
 //Start simply starts a thread for mining. Make sure to only call once!

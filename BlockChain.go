@@ -166,7 +166,7 @@ func makeGenesisBlock() Block {
 	pHash := makeSha256Digest("Hash this")
 	merkleRootDummy := makeSha256Digest("root_dummy_Hash")
 	var b Block
-	b.Initialize(0, pHash, merkleRootDummy, "0")
+	b.Initialize(0, pHash, merkleRootDummy, 0)
 	return b
 }
 
@@ -188,7 +188,7 @@ func makeTenBlocks() []Block {
 	blocks = append(blocks, bZero)
 	for i := 1; i < 10; i++ {
 		var b Block
-		b.Initialize(int32(1), bZero.Header.Hash, "test block value", "00000")
+		b.Initialize(int32(1), bZero.Header.Hash, "test block value", int32(i))
 		blocks = append(blocks, b)
 	}
 	return blocks
