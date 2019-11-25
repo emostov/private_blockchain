@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sync"
 )
@@ -64,16 +65,30 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 			return &pBlock
 		}
 	}
+	log.Println("Log: GetParentBlock: calling askforparent could not find parent block")
+	fmt.Println("debug 68  , ", fmt.Sprint(b.Header.Height-int32(1)))
+	askForParent(b.Header.ParentHash, fmt.Sprint(b.Header.Height-int32(1)))
+	for _, pBlock := range parentHeightBlocks {
+		if pBlock.Header.Hash == b.Header.ParentHash {
+			return &pBlock
+		}
+	}
 	log.Println("Log: GetParentBlock: could not find paretn block")
 	return nil
 }
 
 //Insert inserts a block into a blockchain, checks for duplicates and updates length
-//Also updates the blocks difficulty based on the parents block difficulty
+// Also updates the blocks difficulty based on the parents block difficulty
+// If a parent block cannot be found no insert will happen
 func (sbc *SyncBlockChain) Insert(b Block) {
 	log.Println("Log: Insert: Begin insert attempt")
 	if b.Header.Height >= 1 {
-		b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
+		if sbc.GetParentBlock(&b) != nil {
+			b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
+		} else {
+			log.Println("Log: Insert: could not insert because not parent foudn")
+			return
+		}
 	}
 
 	sbc.Mux.Lock()
