@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -110,8 +111,12 @@ func readRequestBody(r *http.Request) (string, error) {
 
 // ShowHandler ...
 func ShowHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("LOG: ShowHandler")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(SYNCBC.BC.Show()))
+	// w.Write([]byte(SYNCBC.BC.ShowCanonical()))
+	w.Write([]byte(SYNCBC.ShowCanonical()))
+	fmt.Println(SYNCBC.ShowCanonical())
+
 }
 
 //Start simply starts a thread for mining. Make sure to only call once!

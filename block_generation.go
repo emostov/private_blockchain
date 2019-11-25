@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -19,10 +20,11 @@ func (sbc *SyncBlockChain) StartTryingNonces() {
 		// log.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
-		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", TARGET)
+		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", int32(0))
 		blockValue := b.Value
-
-		nonce := generateStartNonce(1)
+		rand.Seed(time.Now().UnixNano()) // generate a random number for start nonce
+		randStart := rand.Intn(300)
+		nonce := generateStartNonce(randStart)
 		puzzleAnswer := ""
 		run := true
 		for run {
