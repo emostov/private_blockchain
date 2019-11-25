@@ -7,8 +7,6 @@ import (
 )
 
 // MINERID is globabl for miner ID - ideally port will become OS.Arg[1] when launched
-// var MINERID = ID{Address: "http://localhost:", Port: "6001"}
-// var miner2id = ID{Address: "http://localhost:", Port: "8001"}
 var MINERID = makeMinerID()
 
 // ServerPeerMap Initializing with two hardcoded minors
@@ -29,9 +27,8 @@ var PEERLIST = PeerList{SelfID: makeMinerID(), PeerIDs: []ID{SID}, Length: 0}
 
 //var target = "000000" // six 0 fairly quick
 
-// TARGET set to seven zeros, which can take a few minutes to mine each block
-// used in block_generation so the hash output must beging with at least target 0's
-var TARGET = "00000"
+// TARGET used in block_generation so the hash output must beging with at least target 0's
+var TARGET = "00000" // five 0, very quick
 
 func main() {
 	if len(os.Args) > 1 {
