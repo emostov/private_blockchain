@@ -1,10 +1,7 @@
 Bare Bones Block Chain
 
-TODO: add notes about timeout on askforblock, difficulty field, starting 
-register node mining, downloads bc from registration node, and how gossip protocol is implemented
-
 Zeke Mostov
-November, 13, 2019
+November 25, 2019
 
 INSTRUCTIONS TO RUN:
 Before running any nodes, registration node set up is not required, but highly 
@@ -25,20 +22,24 @@ ABOUT:
 is not changed while mining. 
 - Nodes start with no hard coded peers other then the ip address for the
 registration node. The registration node starts with no hard coded peers. 
-- Every time a node registers, the registration server responds with the nodes 
-ID and a peermap. The server then updates the peermap with that nodes ID.
-- When a node sends a heart beat to a peer, the peer updates there peerlist with
-the senders id if they do not already have. Next step will be to add functionality
-so the recieving node updates its peerlist with the senders entire peermap.
+- Every time a node registers, the registration node responds with the nodes 
+ID and a peermap. The registration node then updates the peermap with that nodes ID.
+- There is a very simple gossip protocol. When a node sends a heart beat to a 
+peer, the peer updates there peerlist with the senders id if they do not already
+have. Next step will be to add functionality so the recieving node updates its 
+peerlist with the senders entire peermap.
 - Each node has a difficulty field, which is the sume of the difficulty of all
 of its parents and the node itself. ShowCanonical() takes advantage of this field
-to effeciently identify the canoninical chain (the chain with the most difficulty)
+to effeciently O(1) identify the canoninical chain (the chain with the most 
+difficulty)
 - The nonce is seeded at a random int between 0 and 300 and then increments. It
 starts at a random int so it is less deterministic as to who will mine a block 
 first
 - The mining algorithmn is naive in that it just picks the first block at the 
 current length of the chain. A next step would be to implement a function to find
 the canonical chain and then mine on that
+- askForParent() has a timeout of 5 seconds, so if it does not get a response in
+5 seconds it will discontinue waiting.
 
 NEXT STEPS:
 - Add full gossip protocol
