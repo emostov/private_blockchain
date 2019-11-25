@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/sha512"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -24,7 +24,7 @@ Blockchain.
 
 func makeSha256Digest(m string) string {
 	//takes a message string and returns a string of messages sh256 digest
-	h := sha512.New()
+	h := sha256.New()
 	h.Write([]byte(m))
 	outHash := hex.EncodeToString(h.Sum(nil))
 	return outHash

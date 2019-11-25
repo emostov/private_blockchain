@@ -64,15 +64,16 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 			return &pBlock
 		}
 	}
+	log.Println("Log: GetParentBlock: could not find paretn block")
 	return nil
 }
 
 //Insert inserts a block into a blockchain, checks for duplicates and updates length
+//Also updates the blocks difficulty based on the parents block difficulty
 func (sbc *SyncBlockChain) Insert(b Block) {
 	log.Println("Log: Insert: Begin insert attempt")
 	if b.Header.Height >= 1 {
 		b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
-		// fmt.Println(sbc.GetParentBlock(&b))
 	}
 
 	sbc.Mux.Lock()
@@ -102,6 +103,7 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 func (sbc *SyncBlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 	//takes a blockchain instance and a list of json blocks and inserts each block
 	// into the blochchain instance
+	log.Println("LOG: DecodeBlockchainFromJSON: about to decode and insert")
 	var blockList []JSONShape
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
 	if err == nil {
