@@ -45,7 +45,8 @@ func (sbc *SyncBlockChain) ShowCanonical() string {
 		rs += "There is a canoincal chain." + "\n"
 	}
 	for i, bSlice := range canonicalChains {
-		rs += "Chain: " + string(i) + "\n"
+		istr := strconv.Itoa(i)
+		rs += "Chain: " + istr + "\n"
 		for _, bStr := range bSlice {
 			rs += fmt.Sprintf("%s, ", bStr)
 			//rs += bStr + "\n"

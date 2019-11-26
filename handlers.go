@@ -114,6 +114,8 @@ func ShowHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("LOG: ShowHandler")
 	w.WriteHeader(http.StatusOK)
 	// w.Write([]byte(SYNCBC.BC.ShowCanonical()))
+	//w.Write([]byte(SYNCBC.ShowCanonical()))
+	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(SYNCBC.ShowCanonical()))
 	fmt.Println(SYNCBC.ShowCanonical())
 
