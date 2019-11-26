@@ -3,7 +3,7 @@
 # Zeke Mostov
 November 25, 2019
 
-#INSTRUCTIONS TO RUN:
+# INSTRUCTIONS TO RUN:
 Before running any nodes, registration node set up is not required, but highly 
 reccomended to gurantee that the new node will 'meet' other nodes in the network
 and to ensure it has an up to date chain to start mining on.
