@@ -1,9 +1,9 @@
-Bare Bones Block Chain
+#Bare Bones Block Chain
 
-Zeke Mostov
+#Zeke Mostov
 November 25, 2019
 
-INSTRUCTIONS TO RUN:
+#INSTRUCTIONS TO RUN:
 Before running any nodes, registration node set up is not required, but highly 
 reccomended to gurantee that the new node will 'meet' other nodes in the network
 and to ensure it has an up to date chain to start mining on.
@@ -17,7 +17,7 @@ To start nodes, run at the command line and pass a valid port number that is not
 in use. For, example to run at port 8001:
 "go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go 8001"
 
-ABOUT:
+#ABOUT:
 - Currently only a simple POW protocol is implemented, meaning the target value 
 is not changed while mining. 
 - Nodes start with no hard coded peers other then the ip address for the
@@ -41,7 +41,7 @@ the canonical chain and then mine on that
 - askForParent() has a timeout of 5 seconds, so if it does not get a response in
 5 seconds it will discontinue waiting.
 
-NEXT STEPS:
+#NEXT STEPS:
 - Add full gossip protocol
 - Make sure nodes mining on highest difficulty chain
 - Dynamically adjust mining target
