@@ -70,3 +70,27 @@ package main
 // 	}
 // 	fmt.Println(bc.Show())
 // }
+
+// Testing utils and functions
+
+// func printStringSlice(slice []string) {
+// 	// takes slice of json blocks and prints each one
+// 	fmt.Println("about to print each json block in list")
+// 	for _, JSONBlock := range slice {
+// 		fmt.Println(JSONBlock)
+// 	}
+// }
+
+// func makeTenBlocks() []Block {
+// 	// creates an array of  blocks of the same height
+// 	// starts with a genesis block as the only block at Height zero
+// 	bZero := makeGenesisBlock()
+// 	var blocks []Block
+// 	blocks = append(blocks, bZero)
+// 	for i := 1; i < 10; i++ {
+// 		var b Block
+// 		b.Initialize(int32(1), bZero.Header.Hash, "test block value", int32(i))
+// 		blocks = append(blocks, b)
+// 	}
+// 	return blocks
+// }

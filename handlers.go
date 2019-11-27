@@ -48,9 +48,7 @@ func AskForBlock(w http.ResponseWriter, r *http.Request) {
 
 // HeartBeatRecieve ...
 func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
-
 	if r.Method == http.MethodPost {
-
 		requestBody, err := readRequestBody(r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -65,7 +63,7 @@ func HeartBeatRecieve(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(requestBody))
 		log.Println("LOG: HB Recieve: address, port ", data.Address, data.ID)
 
-		// below would implement gossip protocol
+		// below would implement partial gossip protocol
 		// peermap := DecodePeerMapFromJSON(data.PeerMapJSON)
 		// TODO double check data type for HeartBeat Peer Map
 		otherID := ID{Port: data.ID, Address: data.Address}
@@ -113,12 +111,9 @@ func readRequestBody(r *http.Request) (string, error) {
 func ShowHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("LOG: ShowHandler")
 	w.WriteHeader(http.StatusOK)
-	// w.Write([]byte(SYNCBC.BC.ShowCanonical()))
-	//w.Write([]byte(SYNCBC.ShowCanonical()))
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(SYNCBC.ShowCanonical()))
 	fmt.Println(SYNCBC.ShowCanonical())
-
 }
 
 //Start simply starts a thread for mining. Make sure to only call once!
@@ -130,20 +125,7 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		DownloadChain()
 	}
 	go SYNCBC.StartTryingNonces()
-
 	w.Write([]byte("LOG: Start: Mining Engaged"))
-
-}
-
-// Starttest just for doing test ask right now
-func Starttest(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	log.Println("LOG: I am server, I just got asked to start mining")
-	DoMinerRegistration()
-	// DownloadChain()
-	// go SYNCBC.StartTryingNonces()
-	w.Write([]byte("Server Mining Engaged"))
-	testAsk()
 }
 
 //Register returns registration information to node and updates SRD.PeerMap with new ID
@@ -164,4 +146,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		log.Println("LOG: this is the Register server and I just got a BAD request")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+// Starttest just for doing test ask right now
+func Starttest(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	log.Println("LOG: I am server, I just got asked to start mining")
+	DoMinerRegistration()
+	// DownloadChain()
+	// go SYNCBC.StartTryingNonces()
+	w.Write([]byte("Server Mining Engaged"))
+	testAsk()
 }

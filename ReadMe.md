@@ -1,7 +1,5 @@
 # Bare Bones Block Chain
-
-# Zeke Mostov
-November 25, 2019
+Zeke Mostov : November 26, 2019
 
 # INSTRUCTIONS TO RUN:
 Before running any nodes, registration node set up is not required, but highly 
@@ -11,11 +9,12 @@ Non-registration nodes are hardcoded to download there initial chain and peerlis
 from a registration node. To start the registration simply start at command line
 and pass no arguments:
 
-"go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go"
+~$ go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go
 
 To start nodes, run at the command line and pass a valid port number that is not
 in use. For, example to run at port 8001:
-"go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go 8001"
+
+~$ go run Block.go block_generation.go BlockChain.go handlers.go HeartBeat.go logger.go Main.go routes.go broadcast_network.go SyncBlockChain.go Register.go 8001
 
 # ABOUT:
 - Currently only a simple POW protocol is implemented, meaning the target value 

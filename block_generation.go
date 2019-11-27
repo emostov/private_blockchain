@@ -10,14 +10,15 @@ import (
 	"time"
 )
 
-// StartTryingNonces ...
+// StartTryingNonces attempts nonces. It mines at a new height once the bc.length
+// changes. When a block is found it sends out heartbeat data. Uses a random
+// seed value as the initial nonce and then increments. Incrementing does not
+// wrap around
 func (sbc *SyncBlockChain) StartTryingNonces() {
 	log.Println("LOG: StartTryingNonces: started mining ")
 	stop := false
-
 	for !stop {
 		parentBlock := sbc.GetLatestBlock()[0]
-		// log.Println("Just created parent block ")
 		parentHash := parentBlock.Header.Hash
 		var b Block
 		b.Initialize(sbc.BC.Length+1, parentHash, "test block value", int32(0))
@@ -41,25 +42,15 @@ func (sbc *SyncBlockChain) StartTryingNonces() {
 					log.Println("LOG: StartTryingNonces: About to insert and nonce is found")
 					SYNCBC.Insert(b)
 					SendHeartBeat(string(b.EncodeToJSON()))
-
-					//stop = true // delete this line when running
 				}
 			}
-
 		}
-		//stop = true
 	}
 }
 
-// SendHeartBeat ...
+// SendHeartBeat to all peers in peerlist
 func SendHeartBeat(blockJSON string) {
-	//peerMapJSON, err := PEERLIST.PeerListToJSON()
 	peerMapJSON := EncodeIDListToJSON(PEERLIST.PeerIDs)
-
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-
 	HBData := NewHeartBeatData(MINERID.Port, MINERID.Address, blockJSON, string(peerMapJSON))
 	HBDataJSON, _ := HBData.HBDataToJSON()
 	if len(PEERLIST.PeerIDs) >= 1 {
@@ -75,9 +66,10 @@ func SendHeartBeat(blockJSON string) {
 	} else {
 		log.Println("LOG: SendHeartBeat: No peers to send heartbeat to")
 	}
-
 }
 
+// askForParent is a recursive function that asks for the parent block(s) of a block
+// It asks peers in peerlist until a parent block is found.
 func askForParent(parentHash string, height string) bool {
 	intheight, err := strconv.ParseInt((height), 10, 64)
 	if err != nil {
@@ -103,9 +95,7 @@ func askForParent(parentHash string, height string) bool {
 		log.Println("LOG: About to check if need another parent #askForParent")
 		if resp.StatusCode != http.StatusNotFound {
 			b := DecodeFromJSON(string(body))
-			//log.Println("block string is ", string(body))
 			log.Println("block json is", string(b.EncodeToJSON()))
-
 			result := SYNCBC.GetBlock(b.Header.Height, b.Header.Hash)
 			if result != nil || b.Header.Height == 0 {
 				log.Println("LOG: askForParent succeses: ", b.Header.Hash)
@@ -120,16 +110,13 @@ func askForParent(parentHash string, height string) bool {
 				return true
 			}
 		}
-
 	}
 	log.Println("ask for parent does not mpy succesful")
 	return false
 }
 
-// DownloadChain goes to a node in peer list and asks for entire block
+// DownloadChain goes to server node and asks for entire blockchain
 func DownloadChain() {
-	// if len(PEERLIST.PeerIDs) >= 1 {
-	// for _, id := range PEERLIST.PeerIDs {
 	log.Println("LOG: DownloadChain: asking peer ", string(SID.Port), " for chain")
 	resp, err := http.Get(SID.Address + SID.Port + "/Upload")
 	if err != nil {
@@ -145,12 +132,6 @@ func DownloadChain() {
 		SYNCBC.DecodeBlockchainFromJSON(string(body))
 		return
 	}
-
-	// }
-	// } else {
-	// 	log.Println("LOG: DownloadChain: no peers to download from")
-	// }
-
 }
 
 // takes int string, converts to int, adds 1 and converts back to int string
@@ -159,7 +140,6 @@ func generateNonce(previous string) string {
 	if err != nil {
 		log.Fatal("error in generateNonce", err)
 	}
-
 	newNonce := strconv.Itoa(previousInt + 10)
 	return newNonce
 }
@@ -182,6 +162,5 @@ func makePuzzleAnswer(nonce string, parentBlockHash string, blockValue string) s
 }
 
 func checkPuzzleAnswerValid(target string, puzzleAnswer string) bool {
-	// log.Println("target: ", target, "puzzleAnswer ", puzzleAnswer)
 	return target == puzzleAnswer[:len(target)]
 }

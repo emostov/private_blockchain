@@ -55,18 +55,16 @@ func (sbc *SyncBlockChain) GetLatestBlock() []Block {
 // GetParentBlock takes a block as a parameter, and returns its parent block
 func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 	if !(b.Header.Height >= int32(1)) {
-		log.Println("Log: GetParentBlock: err Block height zero, so no parent")
+		log.Println("LOG: GetParentBlock: err Block height zero, so no parent")
 		return nil
 	}
 	parentHeightBlocks := sbc.Get(b.Header.Height - int32(1))
-
 	for _, pBlock := range parentHeightBlocks {
 		if pBlock.Header.Hash == b.Header.ParentHash {
 			return &pBlock
 		}
 	}
-	log.Println("Log: GetParentBlock: calling askforparent could not find parent block")
-	fmt.Println("debug 68  , ", fmt.Sprint(b.Header.Height-int32(1)))
+	log.Println("LOG: GetParentBlock: calling askforparent could not find parent block")
 	askForParent(b.Header.ParentHash, fmt.Sprint(b.Header.Height-int32(1)))
 	for _, pBlock := range parentHeightBlocks {
 		if pBlock.Header.Hash == b.Header.ParentHash {
@@ -86,38 +84,32 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 		if sbc.GetParentBlock(&b) != nil {
 			b.Header.Difficulty = int32(len(TARGET)) + sbc.GetParentBlock(&b).Header.Difficulty
 		} else {
-			log.Println("Log: Insert: could not insert because not parent foudn")
+			log.Println("LOG: Insert: could not insert because not parent found")
 			return
 		}
 	}
-
 	sbc.Mux.Lock()
 	defer sbc.Mux.Unlock()
 	val, ok := sbc.BC.Chain[b.Header.Height]
 	if ok {
 		for i := 0; i < len(val); i++ {
 			if val[i] == b {
-				log.Println("Log: Insert: block was not inserted because duplicate")
+				log.Println("LOG: Insert: block was not inserted because duplicate")
 				return
 			}
 		}
 	}
-
 	sbc.BC.Chain[b.Header.Height] = append(sbc.BC.Chain[b.Header.Height], b)
-	log.Println("Log: Insert: succesful insert for: " + b.Header.Hash)
-
+	log.Println("LOG: Insert: succesful insert for: " + b.Header.Hash)
 	if b.Header.Height > sbc.BC.Length {
 		sbc.BC.Length = b.Header.Height
 	}
-
-	//.Println("LOG: post sbc.insert Show() below ")
-	//fmt.Println(sbc.BC.Show())
 }
 
 //DecodeBlockchainFromJSON ...
+// takes a blockchain instance and a list of json blocks and inserts each block
+// into the blochchain instance
 func (sbc *SyncBlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
-	//takes a blockchain instance and a list of json blocks and inserts each block
-	// into the blochchain instance
 	log.Println("LOG: DecodeBlockchainFromJSON: about to decode and insert")
 	var blockList []JSONShape
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
@@ -136,9 +128,7 @@ func (sbc *SyncBlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
 			sbc.Insert(b)
 		}
 		log.Println("LOG: DecodeBlockchainFromJSON: Succesful decode and inserts ")
-
 	} else {
 		log.Fatalln(err)
 	}
-
 }

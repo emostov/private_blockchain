@@ -30,7 +30,7 @@ func makeSha256Digest(m string) string {
 	return outHash
 }
 
-//JSONShape is a struct used to help in conversion to json
+// JSONShape is a struct used to help in conversion to json
 type JSONShape struct {
 	// for creating proper form when encoding a block to json
 	Difficulty int32  `json:"difficulty"` // target
@@ -63,17 +63,17 @@ type Block struct {
 //Header tools
 
 // NewHeader is used to create and initialize a heder
+// returns a header after given Height and parent Hash
+// called by the block initialization method
 func NewHeader(Height int32, pHash string, difficulty int32) Header {
-	// returns a header after given Height and parent Hash
-	// called by the block initialization method
 	time := int64(time.Now().Unix())
 	return Header{Height: Height, ParentHash: pHash, Timestamp: time, Size: int32(32), Difficulty: difficulty}
 }
 
 // Initialize an instance of a block
+// takes a block, its Height, its ParentHash, and value and intializes it with
+// header containing Hash
 func (b *Block) Initialize(Height int32, ParentHash string, value string, difficulty int32) {
-	// takes a block, its Height, its ParentHash, and value and intializes it with
-	// header containing Hash
 	b.Value = value
 	b.Header = NewHeader(Height, ParentHash, difficulty)
 	HashStr := string(b.Header.Height) + string(b.Header.Timestamp) + b.Header.ParentHash + string(b.Header.Size) + b.Value
@@ -82,8 +82,8 @@ func (b *Block) Initialize(Height int32, ParentHash string, value string, diffic
 }
 
 // EncodeToJSON a block instance
+// takes a block pointer and returns an json encoded string of the block
 func (b *Block) EncodeToJSON() []byte {
-	// takes a block pointer and returns an json encoded string of the block
 	shape := JSONShape{
 		Difficulty: b.Header.Difficulty,
 		Nonce:      b.Header.Nonce,
@@ -103,9 +103,9 @@ func (b *Block) EncodeToJSON() []byte {
 	return encoded
 }
 
-//DecodeFromJSON takes a json string of a block and converts into a block instance
+// DecodeFromJSON takes a json string of a block and converts into a block instance
+// takes in a string of a json encoded block and returns a block pointer
 func DecodeFromJSON(m string) *Block {
-	// takes in a string of a json encoded block and returns a block pointer
 	var shape JSONShape
 	json.Unmarshal([]byte(m), &shape)
 	h := Header{

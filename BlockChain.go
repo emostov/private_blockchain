@@ -6,13 +6,16 @@ import (
 	"log"
 )
 
+// NOTE all functions beginning with "NonSync" have a sync counterpart in
+// SyncBlockChain
+
 // BlockChain struct is used to describe the structure of the blockchain
 type BlockChain struct {
 	Chain  map[int32][]Block `json:"chain"`
 	Length int32             `json:"length"` // length starts at 0
 }
 
-//NewBlockChain creates a new blockchain instance, initializing map
+// NewBlockChain creates a new blockchain instance, initializing map
 func NewBlockChain() *BlockChain {
 	// use this to create and initializea block chain instance
 	var bc BlockChain
@@ -21,10 +24,10 @@ func NewBlockChain() *BlockChain {
 	return &bc
 }
 
-//NonSyncGet  returns a blockchain instance's Height
+// NonSyncGet returns a blockchain instance's Height
+// takes an instance of a block chain and a Height in int32
+// returns a slice containing the blocks at that that Height or nil
 func (bc *BlockChain) NonSyncGet(Height int32) []Block {
-	// takes an instance of a block chain and a Height in int32
-	// returns a slice containing the blocks at that that Height or nil
 	if val, ok := bc.Chain[Height]; ok {
 		return val
 	}
@@ -56,22 +59,19 @@ func (bc *BlockChain) NonSyncInsert(b Block) {
 			}
 		}
 	}
-
 	bc.Chain[b.Header.Height] = append(bc.Chain[b.Header.Height], b)
 
 	if b.Header.Height > bc.Length {
 		bc.Length = b.Header.Height
 	}
-
 	fmt.Println("LOG: post bc.insert Show() below ")
 	fmt.Println(bc.Show())
-
 }
 
-//EncodeToJSON encodes all blocks in chain and puts them into a slice
+// EncodeToJSON encodes all blocks in chain and puts them into a slice
+// takes a block chain instance and creates a slice of json block Data
+// returns a the slice of json blocks
 func (bc *BlockChain) EncodeToJSON() []string {
-	// takes a block chain instance and creates a slice of json block Data
-	// returns a the slice of json blocks
 	var JSONBlocks []string
 	for _, blockSlice := range bc.Chain {
 		for _, block := range blockSlice {
@@ -82,10 +82,10 @@ func (bc *BlockChain) EncodeToJSON() []string {
 	return JSONBlocks
 }
 
-//EncodeBlockchainToJSON encodes all blocks in chain and puts them into a slice
+// EncodeBlockchainToJSON encodes all blocks in chain and puts them into a slice
+// takes a block chain instance and creates a slice of json block Data
+// returns a the slice of json blocks
 func EncodeBlockchainToJSON(bc *BlockChain) string {
-	// takes a block chain instance and creates a slice of json block Data
-	// returns a the slice of json blocks
 	var JSONBlocks string
 	JSONBlocks = "["
 	for _, blockSlice := range bc.Chain {
@@ -100,26 +100,10 @@ func EncodeBlockchainToJSON(bc *BlockChain) string {
 	return JSONBlocks
 }
 
-// DecodeFromJSON takes a blockchain instance and a list of json blocks
-// and inserts each block into the blochchain instance
-// func (bc *BlockChain) DecodeFromJSON(JSONBlocks string) {
-// 	//takes a blockchain instance and a list of json blocks and inserts each block
-// 	// into the blochchain instance
-// 	//JSONBlocks = []Block(JSONBlocks)
-// 	for _, JSONB := range JSONBlocks {
-// 		block := DecodeFromJSON(JSONB)
-// 		bc.Insert(*block)
-// 	}
-// }
-
-// type JsonType struct {
-// 	Array []string
-// }
-
-//NonSyncDecodeBlockchainFromJSON ...
+// NonSyncDecodeBlockchainFromJSON ...
+//takes a blockchain instance and a list of json blocks and inserts each block
+// into the blochchain instance
 func (bc *BlockChain) NonSyncDecodeBlockchainFromJSON(JSONBlocks string) {
-	//takes a blockchain instance and a list of json blocks and inserts each block
-	// into the blochchain instance
 	var blockList []JSONShape
 	err := json.Unmarshal([]byte(JSONBlocks), &blockList)
 	if err == nil {
@@ -161,35 +145,12 @@ func (bc *BlockChain) NonSyncGetParentBlock(b *Block) *Block {
 }
 
 // makeGenesisBlock makes a dummy block
+// creates and returns a genesis block
 func makeGenesisBlock() Block {
-	//creates and returns a genesis block
+
 	pHash := makeSha256Digest("Hash this")
 	merkleRootDummy := makeSha256Digest("root_dummy_Hash")
 	var b Block
 	b.Initialize(0, pHash, merkleRootDummy, 0)
 	return b
-}
-
-// Testing utils and functions
-
-func printStringSlice(slice []string) {
-	// takes slice of json blocks and prints each one
-	fmt.Println("about to print each json block in list")
-	for _, JSONBlock := range slice {
-		fmt.Println(JSONBlock)
-	}
-}
-
-func makeTenBlocks() []Block {
-	// creates an array of  blocks of the same height
-	// starts with a genesis block as the only block at Height zero
-	bZero := makeGenesisBlock()
-	var blocks []Block
-	blocks = append(blocks, bZero)
-	for i := 1; i < 10; i++ {
-		var b Block
-		b.Initialize(int32(1), bZero.Header.Hash, "test block value", int32(i))
-		blocks = append(blocks, b)
-	}
-	return blocks
 }
