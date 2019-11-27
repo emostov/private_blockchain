@@ -13,7 +13,7 @@ type SyncBlockChain struct {
 	Mux *sync.Mutex `json:"mux"`
 }
 
-//Get returns a blockchain instance's Height
+// Get returns a blockchain instance's Height
 // takes an instance of a block chain and a Height in int32
 // returns a slice containing the blocks at that that Height or nil
 func (sbc *SyncBlockChain) Get(Height int32) []Block {
@@ -75,7 +75,7 @@ func (sbc *SyncBlockChain) GetParentBlock(b *Block) *Block {
 	return nil
 }
 
-//Insert inserts a block into a blockchain, checks for duplicates and updates length
+// Insert inserts a block into a blockchain, checks for duplicates and updates length
 // Also updates the blocks difficulty based on the parents block difficulty
 // If a parent block cannot be found no insert will happen
 func (sbc *SyncBlockChain) Insert(b Block) {
@@ -106,7 +106,7 @@ func (sbc *SyncBlockChain) Insert(b Block) {
 	}
 }
 
-//DecodeBlockchainFromJSON ...
+// DecodeBlockchainFromJSON ...
 // takes a blockchain instance and a list of json blocks and inserts each block
 // into the blochchain instance
 func (sbc *SyncBlockChain) DecodeBlockchainFromJSON(JSONBlocks string) {
